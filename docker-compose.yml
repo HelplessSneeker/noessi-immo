@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: immo-db
+    environment:
+      POSTGRES_USER: immo
+      POSTGRES_PASSWORD: immo_secret
+      POSTGRES_DB: immo_manager
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U immo -d immo_manager"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: immo-backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://immo:immo_secret@db:5432/immo_manager
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - document_storage:/app/documents
+    depends_on:
+      db:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build: ./frontend
+    container_name: immo-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:8000
+
+volumes:
+  postgres_data:
+  document_storage:
