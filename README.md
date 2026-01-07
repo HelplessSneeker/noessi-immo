@@ -41,12 +41,20 @@ Die Applikation ist dann erreichbar unter:
 
 Für die lokale Entwicklung ohne Docker:
 
+**Datenbank (erforderlich):**
+```bash
+# Nur die PostgreSQL-Datenbank starten
+docker compose up db
+```
+
 **Backend:**
 ```bash
 cd backend
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
+
+# Datenbank muss laufen (siehe oben)
 uvicorn app.main:app --reload
 ```
 
@@ -56,6 +64,8 @@ cd frontend
 npm install
 npm run dev
 ```
+
+**Hinweis:** Das Backend benötigt eine laufende PostgreSQL-Datenbank. Starte zuerst die Datenbank mit `docker compose up db`, bevor du das Backend startest.
 
 ## Datenmodell
 

@@ -13,7 +13,8 @@ from ..schemas import DocumentResponse
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
-UPLOAD_DIR = "/app/documents"
+# Use environment variable or default to local path for development
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", os.path.join(os.getcwd(), "documents"))
 
 
 @router.get("/", response_model=List[DocumentResponse])
@@ -71,6 +72,10 @@ async def upload_document(
     description: Optional[str] = Form(None),
     db: Session = Depends(get_db)
 ):
+    # Validate file
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Keine Datei ausgewählt")
+
     # Generate unique filename
     file_ext = os.path.splitext(file.filename)[1] if file.filename else ""
     unique_filename = f"{uuid4()}{file_ext}"

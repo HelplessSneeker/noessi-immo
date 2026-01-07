@@ -23,6 +23,7 @@ services:
     container_name: immo-backend
     environment:
       DATABASE_URL: postgresql+psycopg://immo:immo_secret@db:5432/immo_manager
+      UPLOAD_DIR: /app/documents
     ports:
       - "8000:8000"
     volumes:
@@ -44,7 +45,7 @@ services:
     depends_on:
       - backend
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://backend:8000
 
 volumes:
   postgres_data:

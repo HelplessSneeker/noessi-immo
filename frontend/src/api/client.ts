@@ -12,9 +12,6 @@ import type {
 
 const api = axios.create({
   baseURL: '/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
 });
 
 // Properties
@@ -87,11 +84,7 @@ export const getDocuments = async (propertyId?: string): Promise<Document[]> => 
 };
 
 export const uploadDocument = async (formData: FormData): Promise<Document> => {
-  const { data } = await api.post('/documents/', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
+  const { data } = await api.post('/documents/', formData);
   return data;
 };
 
