@@ -59,9 +59,15 @@ docker compose up --build
 # Nur Backend
 cd backend && uvicorn app.main:app --reload
 
-# Nur Frontend
+# Nur Frontend (benötigt .env - siehe frontend/.env.example)
 cd frontend && npm run dev
 ```
+
+## Implementierungshinweise
+
+- **Datumsformate:** Einheitlich `mm.dd.yy` via DateInput-Komponente
+- **Fehlerbehandlung:** API-Client fängt Fehler ab und zeigt Meldungen
+- **Upload:** Dokumente werden mit Fehlervalidierung hochgeladen
 
 ## Ports
 

@@ -90,6 +90,13 @@ unique_filename = f"{uuid4()}{file_ext}"
 filepath = os.path.join(UPLOAD_DIR, str(property_id), unique_filename)
 ```
 
+**Fehlerbehandlung:** HTTPException mit status_code und detail für Client-Fehler:
+```python
+from fastapi import HTTPException
+
+raise HTTPException(status_code=404, detail="Resource nicht gefunden")
+```
+
 ## Environment Variables
 
 - `DATABASE_URL` — PostgreSQL Connection String (default: `postgresql://immo:immo_secret@db:5432/immo_manager`)

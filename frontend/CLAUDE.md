@@ -132,12 +132,27 @@ onClick={() => {
 }}
 ```
 
-### Deutsche Formatierung
-```tsx
-// Datum
-new Date(dateString).toLocaleDateString('de-AT')
+### Datumsformatierung
 
-// Währung
+**Custom DateInput Komponente** (`src/components/DateInput.tsx`):
+```tsx
+import DateInput from '../components/DateInput';
+<DateInput value={date} onChange={(val) => setDate(val)} />
+```
+
+**Format-Utilities** (`src/utils/dateFormat.ts`):
+```tsx
+import { formatDateForDisplay, formatDateForInput } from '../utils/dateFormat';
+
+// Anzeige: mm.dd.yy
+formatDateForDisplay('2024-01-15') // "01.15.24"
+
+// Input: yyyy-mm-dd
+formatDateForInput('01.15.24') // "2024-01-15"
+```
+
+**Währung:**
+```tsx
 Number(amount).toLocaleString('de-AT', { minimumFractionDigits: 2 })
 ```
 
