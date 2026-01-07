@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { Plus, Building2, Trash2 } from 'lucide-react';
 import { getProperties, createProperty, deleteProperty } from '../api/client';
 import type { PropertyCreate } from '../types';
+import { formatDate } from '../utils/dateFormat';
+import { DateInput } from '../components/DateInput';
 
 function Properties() {
   const [showForm, setShowForm] = useState(false);
@@ -90,8 +92,7 @@ function Properties() {
                 <label className="block text-sm font-medium text-slate-700 mb-1">
                   Kaufdatum
                 </label>
-                <input
-                  type="date"
+                <DateInput
                   name="purchase_date"
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
@@ -171,9 +172,7 @@ function Properties() {
                   </td>
                   <td className="px-6 py-4 text-slate-600">{property.address}</td>
                   <td className="px-6 py-4 text-slate-600">
-                    {property.purchase_date 
-                      ? new Date(property.purchase_date).toLocaleDateString('de-AT')
-                      : '-'}
+                    {formatDate(property.purchase_date) || '-'}
                   </td>
                   <td className="px-6 py-4 text-right text-slate-600">
                     {property.purchase_price

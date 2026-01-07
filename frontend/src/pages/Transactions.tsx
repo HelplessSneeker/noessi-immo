@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Receipt } from 'lucide-react';
 import { getTransactions, getProperties } from '../api/client';
 import { TRANSACTION_CATEGORY_LABELS, type TransactionCategory } from '../types';
+import { formatDate } from '../utils/dateFormat';
 
 function Transactions() {
   const { data: transactions, isLoading } = useQuery({
@@ -45,7 +46,7 @@ function Transactions() {
               {transactions.map((tx) => (
                 <tr key={tx.id} className="border-b border-slate-100 hover:bg-slate-50">
                   <td className="px-6 py-4 text-slate-600">
-                    {new Date(tx.date).toLocaleDateString('de-AT')}
+                    {formatDate(tx.date)}
                   </td>
                   <td className="px-6 py-4 text-slate-600">
                     {propertyMap.get(tx.property_id) || '-'}

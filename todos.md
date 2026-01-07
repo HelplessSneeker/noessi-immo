@@ -15,3 +15,7 @@ Organizationen währen eine interesante sache
 Logging for backend
 
 error handleing im frontend (upload document ist bereits umgesetzt)
+
+i18n hinzufügen
+
+add support for mobile or smaller screens

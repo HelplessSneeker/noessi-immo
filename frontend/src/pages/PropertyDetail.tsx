@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Plus, Trash2, Download, CreditCard, Receipt, FileText } from 'lucide-react';
-import { 
-  getPropertySummary, 
-  getCredits, 
-  getTransactions, 
+import {
+  getPropertySummary,
+  getCredits,
+  getTransactions,
   getDocuments,
   createCredit,
   createTransaction,
@@ -15,8 +15,8 @@ import {
   deleteDocument,
   getDocumentDownloadUrl
 } from '../api/client';
-import { 
-  TRANSACTION_CATEGORY_LABELS, 
+import {
+  TRANSACTION_CATEGORY_LABELS,
   DOCUMENT_CATEGORY_LABELS,
   type CreditCreate,
   type TransactionCreate,
@@ -24,6 +24,8 @@ import {
   type TransactionCategory,
   type TransactionType
 } from '../types';
+import { formatDate } from '../utils/dateFormat';
+import { DateInput } from '../components/DateInput';
 
 function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
@@ -153,9 +155,7 @@ function OverviewTab({ property }: { property: any }) {
         <div>
           <dt className="text-sm text-slate-500">Kaufdatum</dt>
           <dd className="text-slate-800">
-            {property.purchase_date 
-              ? new Date(property.purchase_date).toLocaleDateString('de-AT')
-              : '-'}
+            {formatDate(property.purchase_date) || '-'}
           </dd>
         </div>
         <div>
@@ -248,11 +248,11 @@ function CreditsTab({ propertyId, credits }: { propertyId: string; credits: any[
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Startdatum *</label>
-                <input type="date" name="start_date" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                <DateInput name="start_date" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Enddatum</label>
-                <input type="date" name="end_date" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                <DateInput name="end_date" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
             </div>
             <div className="flex gap-3">
@@ -362,7 +362,7 @@ function TransactionsTab({ propertyId, transactions, credits }: { propertyId: st
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Datum *</label>
-                <input type="date" name="date" required defaultValue={new Date().toISOString().split('T')[0]} className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                <DateInput name="date" required defaultValue={new Date().toISOString().split('T')[0]} className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Typ *</label>
@@ -431,7 +431,7 @@ function TransactionsTab({ propertyId, transactions, credits }: { propertyId: st
             <tbody>
               {transactions.map((tx) => (
                 <tr key={tx.id} className="border-b border-slate-100">
-                  <td className="px-6 py-4 text-slate-600">{new Date(tx.date).toLocaleDateString('de-AT')}</td>
+                  <td className="px-6 py-4 text-slate-600">{formatDate(tx.date)}</td>
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700">
                       {TRANSACTION_CATEGORY_LABELS[tx.category as TransactionCategory] || tx.category}
@@ -541,7 +541,7 @@ function DocumentsTab({ propertyId, documents }: { propertyId: string; documents
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Dokumentdatum</label>
-                <input type="date" name="document_date" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                <DateInput name="document_date" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-1">Beschreibung</label>
@@ -587,7 +587,7 @@ function DocumentsTab({ propertyId, documents }: { propertyId: string; documents
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-600">{doc.description || '-'}</td>
-                  <td className="px-6 py-4 text-slate-600">{new Date(doc.upload_date).toLocaleDateString('de-AT')}</td>
+                  <td className="px-6 py-4 text-slate-600">{formatDate(doc.upload_date)}</td>
                   <td className="px-6 py-4 text-right flex gap-2 justify-end">
                     <a href={getDocumentDownloadUrl(doc.id)} className="p-2 text-slate-400 hover:text-primary-600">
                       <Download className="w-4 h-4" />

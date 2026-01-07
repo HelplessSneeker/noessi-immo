@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { FileText, Download } from 'lucide-react';
 import { getDocuments, getProperties, getDocumentDownloadUrl } from '../api/client';
 import { DOCUMENT_CATEGORY_LABELS, type DocumentCategory } from '../types';
+import { formatDate } from '../utils/dateFormat';
 
 function Documents() {
   const { data: documents, isLoading } = useQuery({
@@ -56,7 +57,7 @@ function Documents() {
                   </td>
                   <td className="px-6 py-4 text-slate-600">{doc.description || '-'}</td>
                   <td className="px-6 py-4 text-slate-600">
-                    {new Date(doc.upload_date).toLocaleDateString('de-AT')}
+                    {formatDate(doc.upload_date)}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <a 
