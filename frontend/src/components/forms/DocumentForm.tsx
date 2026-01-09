@@ -3,21 +3,33 @@ import { useMutation } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { DateInput } from '../DateInput';
 import { uploadDocument } from '../../api/client';
-import { DOCUMENT_CATEGORY_LABELS } from '../../types';
+import { DOCUMENT_CATEGORY_LABELS, type Property } from '../../types';
 
 interface DocumentFormProps {
-  propertyId: string;
+  propertyId?: string;
+  properties?: Property[];
   onSuccess?: () => void;
 }
 
-export function DocumentForm({ propertyId, onSuccess }: DocumentFormProps) {
+export function DocumentForm({ propertyId, properties, onSuccess }: DocumentFormProps) {
   const [showForm, setShowForm] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>(propertyId || '');
+
+  // Get today's date in ISO format (yyyy-mm-dd) for default document date
+  const getTodayISO = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const uploadMutation = useMutation({
     mutationFn: uploadDocument,
     onSuccess: () => {
       setShowForm(false);
+      setSelectedPropertyId('');
       setUploadSuccess(true);
       setTimeout(() => setUploadSuccess(false), 3000);
       onSuccess?.();
@@ -30,7 +42,15 @@ export function DocumentForm({ propertyId, onSuccess }: DocumentFormProps) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    formData.append('property_id', propertyId);
+
+    const effectivePropertyId = propertyId || selectedPropertyId;
+
+    if (!effectivePropertyId) {
+      console.error('No property selected');
+      return;
+    }
+
+    formData.append('property_id', effectivePropertyId);
     uploadMutation.mutate(formData);
   };
 
@@ -74,6 +94,24 @@ export function DocumentForm({ propertyId, onSuccess }: DocumentFormProps) {
                 <label className="block text-sm font-medium text-slate-700 mb-1">Datei *</label>
                 <input type="file" name="file" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
+              {!propertyId && properties && (
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Immobilie *</label>
+                  <select
+                    value={selectedPropertyId}
+                    onChange={(e) => setSelectedPropertyId(e.target.value)}
+                    required
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                  >
+                    <option value="">-- Immobilie wählen --</option>
+                    {properties.map((property) => (
+                      <option key={property.id} value={property.id}>
+                        {property.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Kategorie *</label>
                 <select name="category" required className="w-full px-3 py-2 border border-slate-300 rounded-lg">
@@ -84,7 +122,7 @@ export function DocumentForm({ propertyId, onSuccess }: DocumentFormProps) {
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Dokumentdatum</label>
-                <DateInput name="document_date" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                <DateInput name="document_date" defaultValue={getTodayISO()} className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-1">Beschreibung</label>
@@ -92,10 +130,10 @@ export function DocumentForm({ propertyId, onSuccess }: DocumentFormProps) {
               </div>
             </div>
             <div className="flex gap-3">
-              <button type="submit" disabled={uploadMutation.isPending} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+              <button type="submit" disabled={uploadMutation.isPending || (!propertyId && !selectedPropertyId)} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
                 {uploadMutation.isPending ? 'Hochladen...' : 'Hochladen'}
               </button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200">
+              <button type="button" onClick={() => { setShowForm(false); setSelectedPropertyId(''); }} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200">
                 Abbrechen
               </button>
             </div>

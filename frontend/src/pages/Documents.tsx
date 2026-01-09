@@ -1,10 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Download } from 'lucide-react';
 import { getDocuments, getProperties, getDocumentDownloadUrl } from '../api/client';
 import { DOCUMENT_CATEGORY_LABELS, type DocumentCategory } from '../types';
 import { formatDate } from '../utils/dateFormat';
+import { DocumentForm } from '../components/forms/DocumentForm';
 
 function Documents() {
+  const queryClient = useQueryClient();
+
   const { data: documents, isLoading } = useQuery({
     queryKey: ['documents'],
     queryFn: () => getDocuments(),
@@ -17,6 +20,10 @@ function Documents() {
 
   const propertyMap = new Map(properties?.map(p => [p.id, p.name]) || []);
 
+  const handleDocumentSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['documents'] });
+  };
+
   if (isLoading) {
     return <div className="text-slate-500">Lade...</div>;
   }
@@ -24,6 +31,11 @@ function Documents() {
   return (
     <div>
       <h1 className="text-2xl font-semibold text-slate-800 mb-6">Alle Dokumente</h1>
+
+      <DocumentForm
+        properties={properties || []}
+        onSuccess={handleDocumentSuccess}
+      />
 
       {!documents?.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
