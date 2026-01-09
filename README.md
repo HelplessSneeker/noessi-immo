@@ -73,7 +73,7 @@ npm run dev
 Property (Immobilie)
 ├── Credits (Kredite)
 ├── Transactions (Buchungen) ── optional verknüpft mit Credit
-└── Documents (Dokumente) ── optional verknüpft mit Transaction
+└── Documents (Dokumente) ── optional verknüpft mit Transaction oder Credit
 ```
 
 ## Kategorien
@@ -82,7 +82,7 @@ Property (Immobilie)
 - Miete, Betriebskosten, Reparatur, Kreditrate, Steuer, Sonstiges
 
 **Dokumente:**
-- Betriebskosten, Mietvertrag, Rechnung, Steuer, Hausverwaltung, Sonstiges
+- Mietvertrag, Rechnung, Steuer, Hausverwaltung, Kredit, Sonstiges
 
 ## Nächste Schritte (TODO)
 

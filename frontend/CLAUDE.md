@@ -12,6 +12,12 @@ frontend/
 │   ├── index.css         # Tailwind Imports, globale Styles
 │   ├── api/
 │   │   └── client.ts     # Axios Client, alle API-Funktionen
+│   ├── components/
+│   │   ├── DateInput.tsx # Custom Date Picker (mm.dd.yy Format)
+│   │   └── forms/
+│   │       ├── CreditForm.tsx
+│   │       ├── DocumentForm.tsx
+│   │       └── TransactionForm.tsx
 │   ├── types/
 │   │   └── index.ts      # TypeScript Interfaces, Enums, Labels
 │   └── pages/
@@ -107,6 +113,29 @@ mutation.mutate(data);
 - Buttons: `px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700`
 
 ## Wichtige Patterns
+
+### Wiederverwendbare Form Components
+
+Formulare für Credits, Transactions und Documents sind als separate Komponenten in `src/components/forms/` implementiert:
+
+```tsx
+import CreditForm from '../components/forms/CreditForm';
+import TransactionForm from '../components/forms/TransactionForm';
+import DocumentForm from '../components/forms/DocumentForm';
+
+// Verwendung (Props: propertyId, onSuccess, initialData optional)
+<CreditForm
+  propertyId={propertyId}
+  onSuccess={() => handleSuccess()}
+/>
+
+<DocumentForm
+  propertyId={propertyId}
+  onSuccess={() => handleSuccess()}
+  transactionId={txId}  // optional
+  creditId={creditId}    // optional
+/>
+```
 
 ### Formular mit State
 ```tsx

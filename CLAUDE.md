@@ -34,13 +34,14 @@ Property (Immobilie)
 └── Documents (Dokumente) [1:n]
     └── id, filename, filepath, document_date, category, description
     └── transaction_id (optional) → verknüpft Dokument mit Buchung
+    └── credit_id (optional) → verknüpft Dokument mit Kredit
 ```
 
 ## Kategorien
 
 **TransactionCategory:** miete, betriebskosten, reparatur, kreditrate, steuer, sonstiges
 
-**DocumentCategory:** betriebskosten, mietvertrag, rechnung, steuer, hausverwaltung, sonstiges
+**DocumentCategory:** mietvertrag, rechnung, steuer, hausverwaltung, kredit, sonstiges
 
 ## API-Konventionen
 
