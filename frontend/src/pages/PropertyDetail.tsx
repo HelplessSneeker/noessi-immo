@@ -1,15 +1,12 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, Trash2, Download, CreditCard, Receipt, FileText } from 'lucide-react';
+import { ArrowLeft, Trash2, Download, CreditCard, Receipt, FileText } from 'lucide-react';
 import {
   getPropertySummary,
   getCredits,
   getTransactions,
   getDocuments,
-  createCredit,
-  createTransaction,
-  uploadDocument,
   deleteCredit,
   deleteTransaction,
   deleteDocument,
@@ -18,19 +15,17 @@ import {
 import {
   TRANSACTION_CATEGORY_LABELS,
   DOCUMENT_CATEGORY_LABELS,
-  type CreditCreate,
-  type TransactionCreate,
   type DocumentCategory,
-  type TransactionCategory,
-  type TransactionType
+  type TransactionCategory
 } from '../types';
 import { formatDate } from '../utils/dateFormat';
-import { DateInput } from '../components/DateInput';
+import { CreditForm } from '../components/forms/CreditForm';
+import { TransactionForm } from '../components/forms/TransactionForm';
+import { DocumentForm } from '../components/forms/DocumentForm';
 
 function PropertyDetail() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<'overview' | 'credits' | 'transactions' | 'documents'>('overview');
-  const queryClient = useQueryClient();
 
   const { data: summary, isLoading } = useQuery({
     queryKey: ['property-summary', id],
@@ -60,7 +55,7 @@ function PropertyDetail() {
     return <div className="text-slate-500">Lade...</div>;
   }
 
-  const { property, total_income, total_expenses, balance, total_credit_balance, document_count } = summary;
+  const { property, total_income, total_expenses, balance, total_credit_balance } = summary;
 
   const tabs = [
     { key: 'overview', label: 'Übersicht' },
@@ -178,17 +173,12 @@ function OverviewTab({ property }: { property: any }) {
 }
 
 function CreditsTab({ propertyId, credits }: { propertyId: string; credits: any[] }) {
-  const [showForm, setShowForm] = useState(false);
   const queryClient = useQueryClient();
 
-  const createMutation = useMutation({
-    mutationFn: createCredit,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['credits', propertyId] });
-      queryClient.invalidateQueries({ queryKey: ['property-summary', propertyId] });
-      setShowForm(false);
-    },
-  });
+  const handleSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['credits', propertyId] });
+    queryClient.invalidateQueries({ queryKey: ['property-summary', propertyId] });
+  };
 
   const deleteMutation = useMutation({
     mutationFn: deleteCredit,
@@ -198,74 +188,9 @@ function CreditsTab({ propertyId, credits }: { propertyId: string; credits: any[
     },
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data: CreditCreate = {
-      property_id: propertyId,
-      name: formData.get('name') as string,
-      original_amount: Number(formData.get('original_amount')),
-      interest_rate: Number(formData.get('interest_rate')),
-      monthly_payment: Number(formData.get('monthly_payment')),
-      start_date: formData.get('start_date') as string,
-      end_date: formData.get('end_date') as string || undefined,
-    };
-    createMutation.mutate(data);
-  };
-
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Neuer Kredit
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-          <h3 className="font-medium text-slate-800 mb-4">Neuen Kredit anlegen</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
-                <input type="text" name="name" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="z.B. Wohnbaukredit" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Kreditsumme (€) *</label>
-                <input type="number" name="original_amount" step="0.01" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Zinssatz (%) *</label>
-                <input type="number" name="interest_rate" step="0.01" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Monatliche Rate (€) *</label>
-                <input type="number" name="monthly_payment" step="0.01" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Startdatum *</label>
-                <DateInput name="start_date" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Enddatum</label>
-                <DateInput name="end_date" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button type="submit" disabled={createMutation.isPending} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
-                {createMutation.isPending ? 'Speichern...' : 'Speichern'}
-              </button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200">
-                Abbrechen
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      <CreditForm propertyId={propertyId} onSuccess={handleSuccess} />
 
       {!credits.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
@@ -309,18 +234,13 @@ function CreditsTab({ propertyId, credits }: { propertyId: string; credits: any[
 }
 
 function TransactionsTab({ propertyId, transactions, credits }: { propertyId: string; transactions: any[]; credits: any[] }) {
-  const [showForm, setShowForm] = useState(false);
   const queryClient = useQueryClient();
 
-  const createMutation = useMutation({
-    mutationFn: createTransaction,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions', propertyId] });
-      queryClient.invalidateQueries({ queryKey: ['property-summary', propertyId] });
-      queryClient.invalidateQueries({ queryKey: ['credits', propertyId] });
-      setShowForm(false);
-    },
-  });
+  const handleSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['transactions', propertyId] });
+    queryClient.invalidateQueries({ queryKey: ['property-summary', propertyId] });
+    queryClient.invalidateQueries({ queryKey: ['credits', propertyId] });
+  };
 
   const deleteMutation = useMutation({
     mutationFn: deleteTransaction,
@@ -331,85 +251,9 @@ function TransactionsTab({ propertyId, transactions, credits }: { propertyId: st
     },
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data: TransactionCreate = {
-      property_id: propertyId,
-      date: formData.get('date') as string,
-      type: formData.get('type') as TransactionType,
-      category: formData.get('category') as TransactionCategory,
-      amount: Number(formData.get('amount')),
-      description: formData.get('description') as string || undefined,
-      credit_id: formData.get('credit_id') as string || undefined,
-    };
-    createMutation.mutate(data);
-  };
-
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-          <Plus className="w-4 h-4" />
-          Neue Buchung
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-          <h3 className="font-medium text-slate-800 mb-4">Neue Buchung</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Datum *</label>
-                <DateInput name="date" required defaultValue={new Date().toISOString().split('T')[0]} className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Typ *</label>
-                <select name="type" required className="w-full px-3 py-2 border border-slate-300 rounded-lg">
-                  <option value="income">Einnahme</option>
-                  <option value="expense">Ausgabe</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Kategorie *</label>
-                <select name="category" required className="w-full px-3 py-2 border border-slate-300 rounded-lg">
-                  {Object.entries(TRANSACTION_CATEGORY_LABELS).map(([key, label]) => (
-                    <option key={key} value={key}>{label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Betrag (€) *</label>
-                <input type="number" name="amount" step="0.01" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-              {credits.length > 0 && (
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Kredit (optional)</label>
-                  <select name="credit_id" className="w-full px-3 py-2 border border-slate-300 rounded-lg">
-                    <option value="">-- Kein Kredit --</option>
-                    {credits.map((credit) => (
-                      <option key={credit.id} value={credit.id}>{credit.name}</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Beschreibung</label>
-                <input type="text" name="description" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button type="submit" disabled={createMutation.isPending} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
-                {createMutation.isPending ? 'Speichern...' : 'Speichern'}
-              </button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200">
-                Abbrechen
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      <TransactionForm propertyId={propertyId} credits={credits} onSuccess={handleSuccess} />
 
       {!transactions.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
@@ -457,24 +301,12 @@ function TransactionsTab({ propertyId, transactions, credits }: { propertyId: st
 }
 
 function DocumentsTab({ propertyId, documents }: { propertyId: string; documents: any[] }) {
-  const [showForm, setShowForm] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
   const queryClient = useQueryClient();
 
-  const uploadMutation = useMutation({
-    mutationFn: uploadDocument,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documents', propertyId] });
-      queryClient.invalidateQueries({ queryKey: ['property-summary', propertyId] });
-      setShowForm(false);
-      setUploadSuccess(true);
-      setTimeout(() => setUploadSuccess(false), 3000);
-    },
-    onError: (error: any) => {
-      console.error('Upload error:', error);
-      // Error is displayed inline in the form
-    },
-  });
+  const handleSuccess = () => {
+    queryClient.invalidateQueries({ queryKey: ['documents', propertyId] });
+    queryClient.invalidateQueries({ queryKey: ['property-summary', propertyId] });
+  };
 
   const deleteMutation = useMutation({
     mutationFn: deleteDocument,
@@ -484,81 +316,9 @@ function DocumentsTab({ propertyId, documents }: { propertyId: string; documents
     },
   });
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    formData.append('property_id', propertyId);
-    uploadMutation.mutate(formData);
-  };
-
   return (
     <div>
-      {uploadSuccess && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm text-green-800 font-medium">Dokument erfolgreich hochgeladen!</p>
-        </div>
-      )}
-
-      <div className="flex justify-end mb-4">
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
-          <Plus className="w-4 h-4" />
-          Dokument hochladen
-        </button>
-      </div>
-
-      {showForm && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-          <h3 className="font-medium text-slate-800 mb-4">Dokument hochladen</h3>
-          {uploadMutation.isError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-800 font-medium">Fehler beim Hochladen:</p>
-              <ul className="mt-1 text-sm text-red-700 list-disc list-inside">
-                {(() => {
-                  const errorMessage = (uploadMutation.error as any)?.response?.data?.detail;
-                  if (Array.isArray(errorMessage)) {
-                    return errorMessage.map((msg: string, idx: number) => <li key={idx}>{msg}</li>);
-                  } else if (typeof errorMessage === 'string') {
-                    return <li>{errorMessage}</li>;
-                  }
-                  return <li>Ein unbekannter Fehler ist aufgetreten</li>;
-                })()}
-              </ul>
-            </div>
-          )}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Datei *</label>
-                <input type="file" name="file" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Kategorie *</label>
-                <select name="category" required className="w-full px-3 py-2 border border-slate-300 rounded-lg">
-                  {Object.entries(DOCUMENT_CATEGORY_LABELS).map(([key, label]) => (
-                    <option key={key} value={key}>{label}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Dokumentdatum</label>
-                <DateInput name="document_date" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">Beschreibung</label>
-                <input type="text" name="description" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button type="submit" disabled={uploadMutation.isPending} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
-                {uploadMutation.isPending ? 'Hochladen...' : 'Hochladen'}
-              </button>
-              <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200">
-                Abbrechen
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
+      <DocumentForm propertyId={propertyId} onSuccess={handleSuccess} />
 
       {!documents.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">

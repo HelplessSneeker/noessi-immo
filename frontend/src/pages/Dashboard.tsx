@@ -60,7 +60,7 @@ function PropertyCard({ propertyId }: { propertyId: string }) {
     );
   }
 
-  const { property, total_income, total_expenses, balance, total_credit_balance, document_count } = summary;
+  const { property, total_income, total_expenses, total_credit_balance, document_count } = summary;
 
   return (
     <Link

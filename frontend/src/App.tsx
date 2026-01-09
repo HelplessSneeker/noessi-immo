@@ -1,5 +1,5 @@
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Home, Building2, FileText, CreditCard, Receipt } from 'lucide-react';
+import { Home, Building2, FileText, Receipt } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Properties from './pages/Properties';
 import PropertyDetail from './pages/PropertyDetail';
