@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { DateInput } from '../DateInput';
-import { uploadDocument } from '../../api/client';
-import { DOCUMENT_CATEGORY_LABELS, type Property } from '../../types';
+import { uploadDocument, getTransactions, getCredits } from '../../api/client';
+import { DOCUMENT_CATEGORY_LABELS, type Property, type DocumentCategory } from '../../types';
 
 interface DocumentFormProps {
   propertyId?: string;
@@ -15,6 +15,36 @@ export function DocumentForm({ propertyId, properties, onSuccess }: DocumentForm
   const [showForm, setShowForm] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>(propertyId || '');
+  const [selectedCategory, setSelectedCategory] = useState<DocumentCategory>('rechnung');
+  const [selectedTransactionId, setSelectedTransactionId] = useState<string>('');
+  const [selectedCreditId, setSelectedCreditId] = useState<string>('');
+
+  // Get effective property ID (prop or state)
+  const effectivePropertyId = propertyId || selectedPropertyId;
+
+  // Fetch transactions for the selected property (only when category is 'rechnung')
+  const { data: transactions } = useQuery({
+    queryKey: ['transactions', effectivePropertyId],
+    queryFn: () => getTransactions(effectivePropertyId),
+    enabled: !!effectivePropertyId && selectedCategory === 'rechnung',
+  });
+
+  // Fetch credits for the selected property (only when category is 'kredit')
+  const { data: credits } = useQuery({
+    queryKey: ['credits', effectivePropertyId],
+    queryFn: () => getCredits(effectivePropertyId),
+    enabled: !!effectivePropertyId && selectedCategory === 'kredit',
+  });
+
+  // Clear transaction/credit fields when category changes
+  useEffect(() => {
+    if (selectedCategory !== 'rechnung') {
+      setSelectedTransactionId('');
+    }
+    if (selectedCategory !== 'kredit') {
+      setSelectedCreditId('');
+    }
+  }, [selectedCategory]);
 
   // Get today's date in ISO format (yyyy-mm-dd) for default document date
   const getTodayISO = () => {
@@ -30,6 +60,9 @@ export function DocumentForm({ propertyId, properties, onSuccess }: DocumentForm
     onSuccess: () => {
       setShowForm(false);
       setSelectedPropertyId('');
+      setSelectedCategory('rechnung');
+      setSelectedTransactionId('');
+      setSelectedCreditId('');
       setUploadSuccess(true);
       setTimeout(() => setUploadSuccess(false), 3000);
       onSuccess?.();
@@ -43,14 +76,21 @@ export function DocumentForm({ propertyId, properties, onSuccess }: DocumentForm
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    const effectivePropertyId = propertyId || selectedPropertyId;
-
     if (!effectivePropertyId) {
       console.error('No property selected');
       return;
     }
 
     formData.append('property_id', effectivePropertyId);
+
+    // Add transaction_id or credit_id based on category
+    if (selectedCategory === 'rechnung' && selectedTransactionId) {
+      formData.append('transaction_id', selectedTransactionId);
+    }
+    if (selectedCategory === 'kredit' && selectedCreditId) {
+      formData.append('credit_id', selectedCreditId);
+    }
+
     uploadMutation.mutate(formData);
   };
 
@@ -63,7 +103,10 @@ export function DocumentForm({ propertyId, properties, onSuccess }: DocumentForm
       )}
 
       <div className="flex justify-end mb-4">
-        <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+        <button
+          onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+        >
           <Plus className="w-4 h-4" />
           Dokument hochladen
         </button>
@@ -114,7 +157,13 @@ export function DocumentForm({ propertyId, properties, onSuccess }: DocumentForm
               )}
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Kategorie *</label>
-                <select name="category" required className="w-full px-3 py-2 border border-slate-300 rounded-lg">
+                <select
+                  name="category"
+                  required
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value as DocumentCategory)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                >
                   {Object.entries(DOCUMENT_CATEGORY_LABELS).map(([key, label]) => (
                     <option key={key} value={key}>{label}</option>
                   ))}
@@ -122,18 +171,79 @@ export function DocumentForm({ propertyId, properties, onSuccess }: DocumentForm
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Dokumentdatum</label>
-                <DateInput name="document_date" defaultValue={getTodayISO()} className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                <DateInput
+                  name="document_date"
+                  defaultValue={getTodayISO()}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                />
               </div>
+
+              {/* Conditional Transaction Dropdown */}
+              {selectedCategory === 'rechnung' && (
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Buchung verknüpfen (optional)
+                  </label>
+                  <select
+                    value={selectedTransactionId}
+                    onChange={(e) => setSelectedTransactionId(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                  >
+                    <option value="">-- Keine Buchung --</option>
+                    {transactions?.map((tx) => (
+                      <option key={tx.id} value={tx.id}>
+                        {tx.date} - {tx.description || tx.category} (€{tx.amount})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* Conditional Credit Dropdown */}
+              {selectedCategory === 'kredit' && (
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                    Kredit verknüpfen (optional)
+                  </label>
+                  <select
+                    value={selectedCreditId}
+                    onChange={(e) => setSelectedCreditId(e.target.value)}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                  >
+                    <option value="">-- Kein Kredit --</option>
+                    {credits?.map((credit) => (
+                      <option key={credit.id} value={credit.id}>
+                        {credit.name} (€{credit.original_amount})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-1">Beschreibung</label>
                 <input type="text" name="description" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
             </div>
             <div className="flex gap-3">
-              <button type="submit" disabled={uploadMutation.isPending || (!propertyId && !selectedPropertyId)} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
+              <button
+                type="submit"
+                disabled={uploadMutation.isPending || !effectivePropertyId}
+                className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
+              >
                 {uploadMutation.isPending ? 'Hochladen...' : 'Hochladen'}
               </button>
-              <button type="button" onClick={() => { setShowForm(false); setSelectedPropertyId(''); }} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowForm(false);
+                  setSelectedPropertyId('');
+                  setSelectedCategory('rechnung');
+                  setSelectedTransactionId('');
+                  setSelectedCreditId('');
+                }}
+                className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200"
+              >
                 Abbrechen
               </button>
             </div>

@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Download } from 'lucide-react';
-import { getDocuments, getProperties, getDocumentDownloadUrl } from '../api/client';
+import { getDocuments, getProperties, getTransactions, getCredits, getDocumentDownloadUrl } from '../api/client';
 import { DOCUMENT_CATEGORY_LABELS, type DocumentCategory } from '../types';
 import { formatDate } from '../utils/dateFormat';
 import { DocumentForm } from '../components/forms/DocumentForm';
@@ -18,7 +18,21 @@ function Documents() {
     queryFn: getProperties,
   });
 
+  const { data: transactions } = useQuery({
+    queryKey: ['transactions'],
+    queryFn: () => getTransactions(),
+  });
+
+  const { data: credits } = useQuery({
+    queryKey: ['credits'],
+    queryFn: () => getCredits(),
+  });
+
   const propertyMap = new Map(properties?.map(p => [p.id, p.name]) || []);
+  const transactionMap = new Map(
+    transactions?.map(tx => [tx.id, `${tx.description || tx.category} (${formatDate(tx.date)})`]) || []
+  );
+  const creditMap = new Map(credits?.map(c => [c.id, c.name]) || []);
 
   const handleDocumentSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ['documents'] });
@@ -50,37 +64,47 @@ function Documents() {
                 <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Datei</th>
                 <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Immobilie</th>
                 <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Kategorie</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Verknüpft mit</th>
                 <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Beschreibung</th>
                 <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Hochgeladen</th>
                 <th className="px-6 py-3"></th>
               </tr>
             </thead>
             <tbody>
-              {documents.map((doc) => (
-                <tr key={doc.id} className="border-b border-slate-100 hover:bg-slate-50">
-                  <td className="px-6 py-4 font-medium text-slate-800">{doc.filename}</td>
-                  <td className="px-6 py-4 text-slate-600">
-                    {propertyMap.get(doc.property_id) || '-'}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700">
-                      {DOCUMENT_CATEGORY_LABELS[doc.category as DocumentCategory] || doc.category}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">{doc.description || '-'}</td>
-                  <td className="px-6 py-4 text-slate-600">
-                    {formatDate(doc.upload_date)}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <a 
-                      href={getDocumentDownloadUrl(doc.id)} 
-                      className="p-2 text-slate-400 hover:text-primary-600 inline-block"
-                    >
-                      <Download className="w-4 h-4" />
-                    </a>
-                  </td>
-                </tr>
-              ))}
+              {documents.map((doc) => {
+                const linkedEntity = doc.transaction_id
+                  ? transactionMap.get(doc.transaction_id)
+                  : doc.credit_id
+                  ? creditMap.get(doc.credit_id)
+                  : '-';
+
+                return (
+                  <tr key={doc.id} className="border-b border-slate-100 hover:bg-slate-50">
+                    <td className="px-6 py-4 font-medium text-slate-800">{doc.filename}</td>
+                    <td className="px-6 py-4 text-slate-600">
+                      {propertyMap.get(doc.property_id) || '-'}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700">
+                        {DOCUMENT_CATEGORY_LABELS[doc.category as DocumentCategory] || doc.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">{linkedEntity}</td>
+                    <td className="px-6 py-4 text-slate-600">{doc.description || '-'}</td>
+                    <td className="px-6 py-4 text-slate-600">
+                      {formatDate(doc.upload_date)}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <a
+                        href={getDocumentDownloadUrl(doc.id)}
+                        className="p-2 text-slate-400 hover:text-primary-600 inline-block"
+                      >
+                        <Download className="w-4 h-4" />
+                      </a>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

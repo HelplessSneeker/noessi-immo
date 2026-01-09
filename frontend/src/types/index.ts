@@ -9,12 +9,12 @@ export type TransactionCategory =
   | 'steuer' 
   | 'sonstiges';
 
-export type DocumentCategory = 
-  | 'betriebskosten' 
-  | 'mietvertrag' 
-  | 'rechnung' 
-  | 'steuer' 
-  | 'hausverwaltung' 
+export type DocumentCategory =
+  | 'mietvertrag'
+  | 'rechnung'
+  | 'steuer'
+  | 'hausverwaltung'
+  | 'kredit'
   | 'sonstiges';
 
 // Models
@@ -90,6 +90,7 @@ export interface Document {
   id: string;
   property_id: string;
   transaction_id: string | null;
+  credit_id: string | null;
   filename: string;
   filepath: string;
   upload_date: string;
@@ -120,10 +121,10 @@ export const TRANSACTION_CATEGORY_LABELS: Record<TransactionCategory, string> = 
 };
 
 export const DOCUMENT_CATEGORY_LABELS: Record<DocumentCategory, string> = {
-  betriebskosten: 'Betriebskosten',
   mietvertrag: 'Mietvertrag',
   rechnung: 'Rechnung',
   steuer: 'Steuer',
   hausverwaltung: 'Hausverwaltung',
+  kredit: 'Kredit',
   sonstiges: 'Sonstiges',
 };

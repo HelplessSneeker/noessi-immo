@@ -24,11 +24,11 @@ class TransactionCategory(str, enum.Enum):
 
 
 class DocumentCategory(str, enum.Enum):
-    BETRIEBSKOSTEN = "betriebskosten"
     MIETVERTRAG = "mietvertrag"
     RECHNUNG = "rechnung"
     STEUER = "steuer"
     HAUSVERWALTUNG = "hausverwaltung"
+    KREDIT = "kredit"
     SONSTIGES = "sonstiges"
 
 
@@ -68,6 +68,7 @@ class Credit(Base):
     # Relationships
     property = relationship("Property", back_populates="credits")
     transactions = relationship("Transaction", back_populates="credit")
+    documents = relationship("Document", back_populates="credit")
 
 
 class Transaction(Base):
@@ -97,6 +98,7 @@ class Document(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     property_id = Column(UUID(as_uuid=True), ForeignKey("properties.id"), nullable=False)
     transaction_id = Column(UUID(as_uuid=True), ForeignKey("transactions.id"), nullable=True)
+    credit_id = Column(UUID(as_uuid=True), ForeignKey("credits.id"), nullable=True)
     filename = Column(String(255), nullable=False)
     filepath = Column(String(500), nullable=False)
     upload_date = Column(DateTime, default=datetime.utcnow)
@@ -109,3 +111,4 @@ class Document(Base):
     # Relationships
     property = relationship("Property", back_populates="documents")
     transaction = relationship("Transaction", back_populates="documents")
+    credit = relationship("Credit", back_populates="documents")

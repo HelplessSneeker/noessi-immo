@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Receipt } from 'lucide-react';
-import { getTransactions, getProperties } from '../api/client';
+import { getTransactions, getProperties, getDocuments } from '../api/client';
 import { TRANSACTION_CATEGORY_LABELS, type TransactionCategory } from '../types';
 import { formatDate } from '../utils/dateFormat';
 
@@ -15,7 +15,17 @@ function Transactions() {
     queryFn: getProperties,
   });
 
+  const { data: documents } = useQuery({
+    queryKey: ['documents'],
+    queryFn: () => getDocuments(),
+  });
+
   const propertyMap = new Map(properties?.map(p => [p.id, p.name]) || []);
+  const documentMap = new Map(
+    documents
+      ?.filter(doc => doc.transaction_id)
+      ?.map(doc => [doc.transaction_id, doc.filename]) || []
+  );
 
   if (isLoading) {
     return <div className="text-slate-500">Lade...</div>;
@@ -39,6 +49,7 @@ function Transactions() {
                 <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Immobilie</th>
                 <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Kategorie</th>
                 <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Beschreibung</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Dokument</th>
                 <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Betrag</th>
               </tr>
             </thead>
@@ -57,6 +68,7 @@ function Transactions() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-600">{tx.description || '-'}</td>
+                  <td className="px-6 py-4 text-slate-600">{documentMap.get(tx.id) || '-'}</td>
                   <td className={`px-6 py-4 text-right font-medium ${tx.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                     {tx.type === 'income' ? '+' : '-'}€ {Number(tx.amount).toLocaleString('de-AT', { minimumFractionDigits: 2 })}
                   </td>

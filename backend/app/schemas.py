@@ -22,11 +22,11 @@ class TransactionCategory(str, Enum):
 
 
 class DocumentCategory(str, Enum):
-    BETRIEBSKOSTEN = "betriebskosten"
     MIETVERTRAG = "mietvertrag"
     RECHNUNG = "rechnung"
     STEUER = "steuer"
     HAUSVERWALTUNG = "hausverwaltung"
+    KREDIT = "kredit"
     SONSTIGES = "sonstiges"
 
 
@@ -137,12 +137,14 @@ class DocumentBase(BaseModel):
 class DocumentCreate(DocumentBase):
     property_id: UUID
     transaction_id: Optional[UUID] = None
+    credit_id: Optional[UUID] = None
 
 
 class DocumentResponse(DocumentBase):
     id: UUID
     property_id: UUID
     transaction_id: Optional[UUID] = None
+    credit_id: Optional[UUID] = None
     filename: str
     filepath: str
     upload_date: datetime
