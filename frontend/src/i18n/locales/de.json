@@ -1,0 +1,138 @@
+{
+  "app": {
+    "title": "Immo Manager",
+    "dashboard": "Dashboard",
+    "properties": "Immobilien",
+    "finances": "Finanzen",
+    "documents": "Dokumente"
+  },
+  "common": {
+    "save": "Speichern",
+    "saving": "Speichern...",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "loading": "Lade...",
+    "required": "erforderlich",
+    "optional": "optional",
+    "actions": "Aktionen",
+    "back": "Zurück",
+    "close": "Schließen",
+    "add": "Hinzufügen",
+    "new": "Neu"
+  },
+  "property": {
+    "property": "Immobilie",
+    "properties": "Immobilien",
+    "name": "Name",
+    "namePlaceholder": "z.B. ETW Klagenfurt",
+    "address": "Adresse",
+    "addressPlaceholder": "Straße Nr, PLZ Ort",
+    "purchaseDate": "Kaufdatum",
+    "purchasePrice": "Kaufpreis (€)",
+    "notes": "Notizen",
+    "addProperty": "Immobilie hinzufügen",
+    "newProperty": "Neue Immobilie",
+    "createProperty": "Neue Immobilie anlegen",
+    "noProperties": "Keine Immobilien vorhanden",
+    "noPropertiesYet": "Noch keine Immobilien vorhanden.",
+    "noPropertiesDescription": "Füge deine erste Immobilie hinzu, um loszulegen.",
+    "deleteConfirm": "Immobilie wirklich löschen?"
+  },
+  "transaction": {
+    "transaction": "Buchung",
+    "transactions": "Buchungen",
+    "newTransaction": "Neue Buchung",
+    "allTransactions": "Alle Buchungen",
+    "date": "Datum",
+    "type": "Typ",
+    "category": "Kategorie",
+    "amount": "Betrag",
+    "amountPlaceholder": "z.B. 1500",
+    "description": "Beschreibung",
+    "recurring": "Wiederkehrend",
+    "income": "Einnahme",
+    "expense": "Ausgabe",
+    "noTransactions": "Keine Buchungen vorhanden.",
+    "linkToCredit": "Kredit verknüpfen",
+    "linkedCredit": "Verknüpfter Kredit",
+    "selectCredit": "Kredit wählen",
+    "optional": "(optional)",
+    "deleteConfirm": "Buchung löschen?"
+  },
+  "credit": {
+    "credit": "Kredit",
+    "credits": "Kredite",
+    "newCredit": "Neuer Kredit",
+    "name": "Name",
+    "namePlaceholder": "z.B. Hypothek Bank Austria",
+    "originalAmount": "Kreditsumme (€)",
+    "interestRate": "Zinssatz (%)",
+    "interestRatePlaceholder": "z.B. 3.5",
+    "monthlyPayment": "Monatl. Rate (€)",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "currentBalance": "Restschuld",
+    "noCredits": "Keine Kredite vorhanden.",
+    "deleteConfirm": "Kredit wirklich löschen?",
+    "payments": "Zahlungen"
+  },
+  "document": {
+    "document": "Dokument",
+    "documents": "Dokumente",
+    "allDocuments": "Alle Dokumente",
+    "upload": "Dokument hochladen",
+    "uploadSuccess": "Dokument erfolgreich hochgeladen!",
+    "uploadError": "Fehler beim Hochladen:",
+    "file": "Datei",
+    "filename": "Dateiname",
+    "category": "Kategorie",
+    "documentDate": "Dokumentdatum",
+    "description": "Beschreibung",
+    "noDocuments": "Keine Dokumente vorhanden.",
+    "linkToTransaction": "Buchung verknüpfen",
+    "linkToCredit": "Kredit verknüpfen",
+    "linkedTo": "Verknüpft mit",
+    "selectProperty": "Immobilie wählen",
+    "noFile": "Keine Datei ausgewählt",
+    "uploaded": "Hochgeladen",
+    "deleteConfirm": "Dokument löschen?"
+  },
+  "categories": {
+    "transaction": {
+      "rent": "Miete",
+      "operating_costs": "Betriebskosten",
+      "repair": "Reparatur",
+      "loan_payment": "Kreditrate",
+      "tax": "Steuer",
+      "other": "Sonstiges"
+    },
+    "document": {
+      "rental_contract": "Mietvertrag",
+      "invoice": "Rechnung",
+      "tax": "Steuer",
+      "property_management": "Hausverwaltung",
+      "loan": "Kredit",
+      "other": "Sonstiges"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "income": "Einnahmen",
+    "expenses": "Ausgaben",
+    "creditBalance": "Kredit offen",
+    "overview": "Übersicht"
+  },
+  "finances": {
+    "title": "Finanzen",
+    "overview": "Übersicht",
+    "transactionsTab": "Buchungen",
+    "creditsTab": "Kredite"
+  },
+  "tabs": {
+    "overview": "Übersicht",
+    "credits": "Kredite",
+    "transactions": "Buchungen",
+    "documents": "Dokumente"
+  }
+}

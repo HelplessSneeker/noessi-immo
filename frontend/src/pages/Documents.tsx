@@ -1,11 +1,13 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, Download } from 'lucide-react';
 import { getDocuments, getProperties, getTransactions, getCredits, getDocumentDownloadUrl } from '../api/client';
-import { DOCUMENT_CATEGORY_LABELS, type DocumentCategory } from '../types';
+import { type DocumentCategory } from '../types';
 import { formatDate } from '../utils/dateFormat';
 import { DocumentForm } from '../components/forms/DocumentForm';
+import { useTranslation } from '../hooks/useTranslation';
 
 function Documents() {
+  const { t, getDocumentCategoryLabel } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data: documents, isLoading } = useQuery({
@@ -39,12 +41,12 @@ function Documents() {
   };
 
   if (isLoading) {
-    return <div className="text-slate-500">Lade...</div>;
+    return <div className="text-slate-500">{t('common.loading')}</div>;
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-800 mb-6">Alle Dokumente</h1>
+      <h1 className="text-2xl font-semibold text-slate-800 mb-6">{t('document.allDocuments')}</h1>
 
       <DocumentForm
         properties={properties || []}
@@ -54,19 +56,19 @@ function Documents() {
       {!documents?.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
           <FileText className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-          <p className="text-slate-500">Keine Dokumente vorhanden.</p>
+          <p className="text-slate-500">{t('document.noDocuments')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Datei</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Immobilie</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Kategorie</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Verknüpft mit</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Beschreibung</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Hochgeladen</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.filename')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('property.property')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.category')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.linkedTo')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.description')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.uploaded')}</th>
                 <th className="px-6 py-3"></th>
               </tr>
             </thead>
@@ -86,7 +88,7 @@ function Documents() {
                     </td>
                     <td className="px-6 py-4">
                       <span className="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700">
-                        {DOCUMENT_CATEGORY_LABELS[doc.category as DocumentCategory] || doc.category}
+                        {getDocumentCategoryLabel(doc.category as DocumentCategory)}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-slate-600">{linkedEntity}</td>

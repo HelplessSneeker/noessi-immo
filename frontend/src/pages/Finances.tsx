@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Receipt, CreditCard, Trash2 } from 'lucide-react';
 import { getTransactions, getProperties, getDocuments, getCredits, deleteCredit } from '../api/client';
-import { TRANSACTION_CATEGORY_LABELS, type TransactionCategory, type Credit, type Transaction, type Property } from '../types';
+import { type TransactionCategory, type Credit, type Transaction, type Property } from '../types';
 import { formatDate } from '../utils/dateFormat';
 import { GlobalCreditForm } from '../components/forms/GlobalCreditForm';
 import { GlobalTransactionForm } from '../components/forms/GlobalTransactionForm';
+import { useTranslation } from '../hooks/useTranslation';
 
-function Finanzen() {
-  const [activeTab, setActiveTab] = useState<'buchungen' | 'kredite'>('buchungen');
+function Finances() {
+  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<'transactions' | 'credits'>('transactions');
 
   // Fetch all data (no property filter)
   const { data: transactions, isLoading: transactionsLoading } = useQuery({
@@ -40,13 +42,13 @@ function Finanzen() {
   );
 
   const tabs = [
-    { key: 'buchungen' as const, label: `Buchungen (${transactions?.length || 0})` },
-    { key: 'kredite' as const, label: `Kredite (${credits?.length || 0})` },
+    { key: 'transactions' as const, label: `${t('tabs.transactions')} (${transactions?.length || 0})` },
+    { key: 'credits' as const, label: `${t('tabs.credits')} (${credits?.length || 0})` },
   ];
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-800 mb-6">Finanzen</h1>
+      <h1 className="text-2xl font-semibold text-slate-800 mb-6">{t('finances.title')}</h1>
 
       {/* Tab Navigation */}
       <div className="border-b border-slate-200 mb-6">
@@ -68,8 +70,8 @@ function Finanzen() {
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'buchungen' && (
-        <BuchungenTab
+      {activeTab === 'transactions' && (
+        <TransactionsTab
           transactions={transactions || []}
           isLoading={transactionsLoading}
           properties={properties || []}
@@ -79,8 +81,8 @@ function Finanzen() {
         />
       )}
 
-      {activeTab === 'kredite' && (
-        <KrediteTab
+      {activeTab === 'credits' && (
+        <CreditsTab
           credits={credits || []}
           properties={properties || []}
           propertyMap={propertyMap}
@@ -90,7 +92,7 @@ function Finanzen() {
   );
 }
 
-function BuchungenTab({
+function TransactionsTab({
   transactions,
   isLoading,
   properties,
@@ -105,8 +107,10 @@ function BuchungenTab({
   propertyMap: Map<string, string>;
   documentMap: Map<string, string>;
 }) {
+  const { t, getTransactionCategoryLabel } = useTranslation();
+
   if (isLoading) {
-    return <div className="text-slate-500">Lade...</div>;
+    return <div className="text-slate-500">{t('common.loading')}</div>;
   }
 
   return (
@@ -115,19 +119,19 @@ function BuchungenTab({
       {!transactions.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
           <Receipt className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-          <p className="text-slate-500">Keine Buchungen vorhanden.</p>
+          <p className="text-slate-500">{t('transaction.noTransactions')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Datum</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Immobilie</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Kategorie</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Beschreibung</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Dokument</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Betrag</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.date')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('property.property')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.category')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.description')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.document')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.amount')}</th>
               </tr>
             </thead>
             <tbody>
@@ -141,7 +145,7 @@ function BuchungenTab({
                   </td>
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700">
-                      {TRANSACTION_CATEGORY_LABELS[tx.category as TransactionCategory] || tx.category}
+                      {getTransactionCategoryLabel(tx.category as TransactionCategory)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-600">{tx.description || '-'}</td>
@@ -159,7 +163,7 @@ function BuchungenTab({
   );
 }
 
-function KrediteTab({
+function CreditsTab({
   credits,
   properties,
   propertyMap,
@@ -168,6 +172,7 @@ function KrediteTab({
   properties: Property[];
   propertyMap: Map<string, string>;
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
@@ -185,19 +190,19 @@ function KrediteTab({
       {!credits.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
           <CreditCard className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-          <p className="text-slate-500">Keine Kredite vorhanden.</p>
+          <p className="text-slate-500">{t('credit.noCredits')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Immobilie</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Name</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Kreditsumme</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Zinssatz</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Monatl. Rate</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Restschuld</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('property.property')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('credit.name')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('credit.originalAmount')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('credit.interestRate')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('credit.monthlyPayment')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('credit.currentBalance')}</th>
                 <th className="px-6 py-3"></th>
               </tr>
             </thead>
@@ -222,7 +227,7 @@ function KrediteTab({
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button
-                      onClick={() => { if (confirm('Kredit löschen?')) deleteMutation.mutate(credit.id); }}
+                      onClick={() => { if (confirm(t('credit.deleteConfirm'))) deleteMutation.mutate(credit.id); }}
                       className="p-2 text-slate-400 hover:text-red-600"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -238,4 +243,4 @@ function KrediteTab({
   );
 }
 
-export default Finanzen;
+export default Finances;

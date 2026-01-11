@@ -4,16 +4,18 @@ import Dashboard from './pages/Dashboard';
 import Properties from './pages/Properties';
 import PropertyDetail from './pages/PropertyDetail';
 import Documents from './pages/Documents';
-import Finanzen from './pages/Finanzen';
+import Finances from './pages/Finances';
+import { useTranslation } from './hooks/useTranslation';
 
 function App() {
   const location = useLocation();
+  const { t } = useTranslation();
 
   const navItems = [
-    { path: '/', icon: Home, label: 'Dashboard' },
-    { path: '/properties', icon: Building2, label: 'Immobilien' },
-    { path: '/finanzen', icon: Wallet, label: 'Finanzen' },
-    { path: '/documents', icon: FileText, label: 'Dokumente' },
+    { path: '/', icon: Home, label: t('app.dashboard') },
+    { path: '/properties', icon: Building2, label: t('app.properties') },
+    { path: '/finanzen', icon: Wallet, label: t('app.finances') },
+    { path: '/documents', icon: FileText, label: t('app.documents') },
   ];
 
   return (
@@ -23,7 +25,7 @@ function App() {
         <div className="mb-8">
           <h1 className="text-xl font-semibold text-slate-800 flex items-center gap-2">
             <Building2 className="w-6 h-6 text-primary-600" />
-            Immo Manager
+            {t('app.title')}
           </h1>
         </div>
 
@@ -55,7 +57,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/properties" element={<Properties />} />
           <Route path="/properties/:id" element={<PropertyDetail />} />
-          <Route path="/finanzen" element={<Finanzen />} />
+          <Route path="/finanzen" element={<Finances />} />
           <Route path="/documents" element={<Documents />} />
         </Routes>
       </main>

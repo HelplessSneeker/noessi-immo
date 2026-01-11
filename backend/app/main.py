@@ -5,20 +5,22 @@ from fastapi.responses import JSONResponse
 
 from .database import engine, Base
 from .routers import properties, credits, transactions, documents
+from .i18n.translator import translator
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Immo Manager API",
-    description="API für die Verwaltung von Eigentumswohnungen in Österreich",
+    description="API for managing condominiums in Austria",
     version="1.0.0"
 )
 
-# Validation error handler with user-friendly messages
+# Validation error handler with user-friendly localized messages
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     errors = exc.errors()
+    locale = translator.get_locale(request)
 
     # Create user-friendly error messages
     friendly_errors = []
@@ -26,27 +28,15 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         field = error.get("loc", [])[-1] if error.get("loc") else "unknown"
         error_type = error.get("type", "")
 
-        # German field name translations
-        field_translations = {
-            "file": "Datei",
-            "property_id": "Immobilien-ID",
-            "category": "Kategorie",
-            "transaction_id": "Transaktions-ID",
-            "document_date": "Dokumentdatum",
-            "description": "Beschreibung",
-            "amount": "Betrag",
-            "date": "Datum",
-            "name": "Name",
-        }
-
-        field_name = field_translations.get(field, field)
+        # Translate field name
+        field_name = translator.translate(field, request)
 
         if error_type == "missing":
-            friendly_errors.append(f"{field_name} ist erforderlich")
+            friendly_errors.append(translator.translate("{} is required", request).format(field_name))
         elif error_type == "value_error":
-            friendly_errors.append(f"{field_name} hat einen ungültigen Wert")
+            friendly_errors.append(translator.translate("{} has an invalid value", request).format(field_name))
         else:
-            friendly_errors.append(error.get("msg", "Validierungsfehler"))
+            friendly_errors.append(translator.translate(error.get("msg", "Validation error"), request))
 
     return JSONResponse(
         status_code=422,

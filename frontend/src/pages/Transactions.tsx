@@ -1,10 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { Receipt } from 'lucide-react';
 import { getTransactions, getProperties, getDocuments } from '../api/client';
-import { TRANSACTION_CATEGORY_LABELS, type TransactionCategory } from '../types';
+import { type TransactionCategory } from '../types';
 import { formatDate } from '../utils/dateFormat';
+import { useTranslation } from '../hooks/useTranslation';
 
 function Transactions() {
+  const { t, getTransactionCategoryLabel } = useTranslation();
+
   const { data: transactions, isLoading } = useQuery({
     queryKey: ['transactions'],
     queryFn: () => getTransactions(),
@@ -28,29 +31,29 @@ function Transactions() {
   );
 
   if (isLoading) {
-    return <div className="text-slate-500">Lade...</div>;
+    return <div className="text-slate-500">{t('common.loading')}</div>;
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-800 mb-6">Alle Buchungen</h1>
+      <h1 className="text-2xl font-semibold text-slate-800 mb-6">{t('transaction.allTransactions')}</h1>
 
       {!transactions?.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
           <Receipt className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-          <p className="text-slate-500">Keine Buchungen vorhanden.</p>
+          <p className="text-slate-500">{t('transaction.noTransactions')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Datum</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Immobilie</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Kategorie</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Beschreibung</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Dokument</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Betrag</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.date')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('property.property')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.category')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.description')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.document')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.amount')}</th>
               </tr>
             </thead>
             <tbody>
@@ -64,7 +67,7 @@ function Transactions() {
                   </td>
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700">
-                      {TRANSACTION_CATEGORY_LABELS[tx.category as TransactionCategory] || tx.category}
+                      {getTransactionCategoryLabel(tx.category as TransactionCategory)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-600">{tx.description || '-'}</td>

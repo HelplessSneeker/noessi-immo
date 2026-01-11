@@ -1,0 +1,138 @@
+{
+  "app": {
+    "title": "Property Manager",
+    "dashboard": "Dashboard",
+    "properties": "Properties",
+    "finances": "Finances",
+    "documents": "Documents"
+  },
+  "common": {
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "required": "required",
+    "optional": "optional",
+    "actions": "Actions",
+    "back": "Back",
+    "close": "Close",
+    "add": "Add",
+    "new": "New"
+  },
+  "property": {
+    "property": "Property",
+    "properties": "Properties",
+    "name": "Name",
+    "namePlaceholder": "e.g. Apartment Vienna",
+    "address": "Address",
+    "addressPlaceholder": "Street No, ZIP City",
+    "purchaseDate": "Purchase Date",
+    "purchasePrice": "Purchase Price (€)",
+    "notes": "Notes",
+    "addProperty": "Add Property",
+    "newProperty": "New Property",
+    "createProperty": "Create New Property",
+    "noProperties": "No properties available",
+    "noPropertiesYet": "No properties available yet.",
+    "noPropertiesDescription": "Add your first property to get started.",
+    "deleteConfirm": "Really delete property?"
+  },
+  "transaction": {
+    "transaction": "Transaction",
+    "transactions": "Transactions",
+    "newTransaction": "New Transaction",
+    "allTransactions": "All Transactions",
+    "date": "Date",
+    "type": "Type",
+    "category": "Category",
+    "amount": "Amount",
+    "amountPlaceholder": "e.g. 1500",
+    "description": "Description",
+    "recurring": "Recurring",
+    "income": "Income",
+    "expense": "Expense",
+    "noTransactions": "No transactions available.",
+    "linkToCredit": "Link to Credit",
+    "linkedCredit": "Linked Credit",
+    "selectCredit": "Select Credit",
+    "optional": "(optional)",
+    "deleteConfirm": "Delete transaction?"
+  },
+  "credit": {
+    "credit": "Credit",
+    "credits": "Credits",
+    "newCredit": "New Credit",
+    "name": "Name",
+    "namePlaceholder": "e.g. Mortgage Bank Austria",
+    "originalAmount": "Original Amount (€)",
+    "interestRate": "Interest Rate (%)",
+    "interestRatePlaceholder": "e.g. 3.5",
+    "monthlyPayment": "Monthly Payment (€)",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "currentBalance": "Current Balance",
+    "noCredits": "No credits available.",
+    "deleteConfirm": "Really delete credit?",
+    "payments": "Payments"
+  },
+  "document": {
+    "document": "Document",
+    "documents": "Documents",
+    "allDocuments": "All Documents",
+    "upload": "Upload Document",
+    "uploadSuccess": "Document uploaded successfully!",
+    "uploadError": "Upload error:",
+    "file": "File",
+    "filename": "Filename",
+    "category": "Category",
+    "documentDate": "Document Date",
+    "description": "Description",
+    "noDocuments": "No documents available.",
+    "linkToTransaction": "Link to Transaction",
+    "linkToCredit": "Link to Credit",
+    "linkedTo": "Linked to",
+    "selectProperty": "Select Property",
+    "noFile": "No file selected",
+    "uploaded": "Uploaded",
+    "deleteConfirm": "Delete document?"
+  },
+  "categories": {
+    "transaction": {
+      "rent": "Rent",
+      "operating_costs": "Operating Costs",
+      "repair": "Repair",
+      "loan_payment": "Loan Payment",
+      "tax": "Tax",
+      "other": "Other"
+    },
+    "document": {
+      "rental_contract": "Rental Contract",
+      "invoice": "Invoice",
+      "tax": "Tax",
+      "property_management": "Property Management",
+      "loan": "Loan",
+      "other": "Other"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "income": "Income",
+    "expenses": "Expenses",
+    "creditBalance": "Credit Balance",
+    "overview": "Overview"
+  },
+  "finances": {
+    "title": "Finances",
+    "overview": "Overview",
+    "transactionsTab": "Transactions",
+    "creditsTab": "Credits"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "credits": "Credits",
+    "transactions": "Transactions",
+    "documents": "Documents"
+  }
+}

@@ -4,6 +4,7 @@ import { Plus } from 'lucide-react';
 import { DateInput } from '../DateInput';
 import { createCredit } from '../../api/client';
 import type { CreditCreate } from '../../types';
+import { useTranslation } from '../../hooks/useTranslation';
 
 interface CreditFormProps {
   propertyId: string;
@@ -11,6 +12,7 @@ interface CreditFormProps {
 }
 
 export function CreditForm({ propertyId, onSuccess }: CreditFormProps) {
+  const { t } = useTranslation();
   const [showForm, setShowForm] = useState(false);
 
   const createMutation = useMutation({
@@ -44,46 +46,46 @@ export function CreditForm({ propertyId, onSuccess }: CreditFormProps) {
           className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Neuer Kredit
+          {t('credit.newCredit')}
         </button>
       </div>
 
       {showForm && (
         <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
-          <h3 className="font-medium text-slate-800 mb-4">Neuen Kredit anlegen</h3>
+          <h3 className="font-medium text-slate-800 mb-4">{t('credit.newCredit')}</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Name *</label>
-                <input type="text" name="name" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder="z.B. Wohnbaukredit" />
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('credit.name')} *</label>
+                <input type="text" name="name" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder={t('credit.namePlaceholder')} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Kreditsumme (€) *</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('credit.originalAmount')} *</label>
                 <input type="number" name="original_amount" step="0.01" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Zinssatz (%) *</label>
-                <input type="number" name="interest_rate" step="0.01" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('credit.interestRate')} *</label>
+                <input type="number" name="interest_rate" step="0.01" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" placeholder={t('credit.interestRatePlaceholder')} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Monatliche Rate (€) *</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('credit.monthlyPayment')} *</label>
                 <input type="number" name="monthly_payment" step="0.01" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Startdatum *</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('credit.startDate')} *</label>
                 <DateInput name="start_date" required className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Enddatum</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">{t('credit.endDate')}</label>
                 <DateInput name="end_date" className="w-full px-3 py-2 border border-slate-300 rounded-lg" />
               </div>
             </div>
             <div className="flex gap-3">
               <button type="submit" disabled={createMutation.isPending} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">
-                {createMutation.isPending ? 'Speichern...' : 'Speichern'}
+                {createMutation.isPending ? t('common.saving') : t('common.save')}
               </button>
               <button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200">
-                Abbrechen
+                {t('common.cancel')}
               </button>
             </div>
           </form>

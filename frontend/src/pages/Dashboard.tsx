@@ -2,36 +2,38 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Building2, TrendingUp, TrendingDown, FileText, CreditCard } from 'lucide-react';
 import { getProperties, getPropertySummary } from '../api/client';
+import { useTranslation } from '../hooks/useTranslation';
 
 function Dashboard() {
+  const { t } = useTranslation();
   const { data: properties, isLoading } = useQuery({
     queryKey: ['properties'],
     queryFn: getProperties,
   });
 
   if (isLoading) {
-    return <div className="text-slate-500">Lade...</div>;
+    return <div className="text-slate-500">{t('common.loading')}</div>;
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-800 mb-6">Dashboard</h1>
+      <h1 className="text-2xl font-semibold text-slate-800 mb-6">{t('dashboard.title')}</h1>
 
       {!properties?.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
           <Building2 className="w-12 h-12 text-slate-400 mx-auto mb-4" />
           <h2 className="text-lg font-medium text-slate-700 mb-2">
-            Keine Immobilien vorhanden
+            {t('property.noProperties')}
           </h2>
           <p className="text-slate-500 mb-4">
-            Füge deine erste Immobilie hinzu, um loszulegen.
+            {t('property.noPropertiesDescription')}
           </p>
           <Link
             to="/properties"
             className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
             <Building2 className="w-4 h-4" />
-            Immobilie hinzufügen
+            {t('property.addProperty')}
           </Link>
         </div>
       ) : (
@@ -46,6 +48,7 @@ function Dashboard() {
 }
 
 function PropertyCard({ propertyId }: { propertyId: string }) {
+  const { t } = useTranslation();
   const { data: summary, isLoading } = useQuery({
     queryKey: ['property-summary', propertyId],
     queryFn: () => getPropertySummary(propertyId),
@@ -79,7 +82,7 @@ function PropertyCard({ propertyId }: { propertyId: string }) {
         <div className="flex items-center gap-2">
           <TrendingUp className="w-4 h-4 text-green-600" />
           <div>
-            <p className="text-xs text-slate-500">Einnahmen</p>
+            <p className="text-xs text-slate-500">{t('dashboard.income')}</p>
             <p className="font-medium text-green-600">
               € {Number(total_income).toLocaleString('de-AT', { minimumFractionDigits: 2 })}
             </p>
@@ -89,7 +92,7 @@ function PropertyCard({ propertyId }: { propertyId: string }) {
         <div className="flex items-center gap-2">
           <TrendingDown className="w-4 h-4 text-red-600" />
           <div>
-            <p className="text-xs text-slate-500">Ausgaben</p>
+            <p className="text-xs text-slate-500">{t('dashboard.expenses')}</p>
             <p className="font-medium text-red-600">
               € {Number(total_expenses).toLocaleString('de-AT', { minimumFractionDigits: 2 })}
             </p>
@@ -99,7 +102,7 @@ function PropertyCard({ propertyId }: { propertyId: string }) {
         <div className="flex items-center gap-2">
           <CreditCard className="w-4 h-4 text-slate-600" />
           <div>
-            <p className="text-xs text-slate-500">Kredit offen</p>
+            <p className="text-xs text-slate-500">{t('dashboard.creditBalance')}</p>
             <p className="font-medium text-slate-700">
               € {Number(total_credit_balance).toLocaleString('de-AT', { minimumFractionDigits: 2 })}
             </p>
@@ -109,7 +112,7 @@ function PropertyCard({ propertyId }: { propertyId: string }) {
         <div className="flex items-center gap-2">
           <FileText className="w-4 h-4 text-slate-600" />
           <div>
-            <p className="text-xs text-slate-500">Dokumente</p>
+            <p className="text-xs text-slate-500">{t('document.documents')}</p>
             <p className="font-medium text-slate-700">{document_count}</p>
           </div>
         </div>

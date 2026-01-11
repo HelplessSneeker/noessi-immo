@@ -13,21 +13,21 @@ class TransactionType(str, Enum):
 
 
 class TransactionCategory(str, Enum):
-    MIETE = "miete"
-    BETRIEBSKOSTEN = "betriebskosten"
-    REPARATUR = "reparatur"
-    KREDITRATE = "kreditrate"
-    STEUER = "steuer"
-    SONSTIGES = "sonstiges"
+    RENT = "rent"
+    OPERATING_COSTS = "operating_costs"
+    REPAIR = "repair"
+    LOAN_PAYMENT = "loan_payment"
+    TAX = "tax"
+    OTHER = "other"
 
 
 class DocumentCategory(str, Enum):
-    MIETVERTRAG = "mietvertrag"
-    RECHNUNG = "rechnung"
-    STEUER = "steuer"
-    HAUSVERWALTUNG = "hausverwaltung"
-    KREDIT = "kredit"
-    SONSTIGES = "sonstiges"
+    RENTAL_CONTRACT = "rental_contract"
+    INVOICE = "invoice"
+    TAX = "tax"
+    PROPERTY_MANAGEMENT = "property_management"
+    LOAN = "loan"
+    OTHER = "other"
 
 
 # Property Schemas

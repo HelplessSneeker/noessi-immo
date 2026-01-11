@@ -1,21 +1,21 @@
 // Enums
 export type TransactionType = 'income' | 'expense';
 
-export type TransactionCategory = 
-  | 'miete' 
-  | 'betriebskosten' 
-  | 'reparatur' 
-  | 'kreditrate' 
-  | 'steuer' 
-  | 'sonstiges';
+export type TransactionCategory =
+  | 'rent'
+  | 'operating_costs'
+  | 'repair'
+  | 'loan_payment'
+  | 'tax'
+  | 'other';
 
 export type DocumentCategory =
-  | 'mietvertrag'
-  | 'rechnung'
-  | 'steuer'
-  | 'hausverwaltung'
-  | 'kredit'
-  | 'sonstiges';
+  | 'rental_contract'
+  | 'invoice'
+  | 'tax'
+  | 'property_management'
+  | 'loan'
+  | 'other';
 
 // Models
 export interface Property {
@@ -109,22 +109,3 @@ export interface PropertySummary {
   total_credit_balance: number;
   document_count: number;
 }
-
-// Category Labels (German)
-export const TRANSACTION_CATEGORY_LABELS: Record<TransactionCategory, string> = {
-  miete: 'Miete',
-  betriebskosten: 'Betriebskosten',
-  reparatur: 'Reparatur',
-  kreditrate: 'Kreditrate',
-  steuer: 'Steuer',
-  sonstiges: 'Sonstiges',
-};
-
-export const DOCUMENT_CATEGORY_LABELS: Record<DocumentCategory, string> = {
-  mietvertrag: 'Mietvertrag',
-  rechnung: 'Rechnung',
-  steuer: 'Steuer',
-  hausverwaltung: 'Hausverwaltung',
-  kredit: 'Kredit',
-  sonstiges: 'Sonstiges',
-};

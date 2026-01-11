@@ -13,8 +13,6 @@ import {
   getDocumentDownloadUrl
 } from '../api/client';
 import {
-  TRANSACTION_CATEGORY_LABELS,
-  DOCUMENT_CATEGORY_LABELS,
   type DocumentCategory,
   type TransactionCategory
 } from '../types';
@@ -22,8 +20,10 @@ import { formatDate } from '../utils/dateFormat';
 import { CreditForm } from '../components/forms/CreditForm';
 import { TransactionForm } from '../components/forms/TransactionForm';
 import { DocumentForm } from '../components/forms/DocumentForm';
+import { useTranslation } from '../hooks/useTranslation';
 
 function PropertyDetail() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<'overview' | 'credits' | 'transactions' | 'documents'>('overview');
 
@@ -52,26 +52,26 @@ function PropertyDetail() {
   });
 
   if (isLoading || !summary) {
-    return <div className="text-slate-500">Lade...</div>;
+    return <div className="text-slate-500">{t('common.loading')}</div>;
   }
 
   const { property, total_income, total_expenses, balance, total_credit_balance } = summary;
 
   const tabs = [
-    { key: 'overview', label: 'Übersicht' },
-    { key: 'credits', label: `Kredite (${credits?.length || 0})` },
-    { key: 'transactions', label: `Buchungen (${transactions?.length || 0})` },
-    { key: 'documents', label: `Dokumente (${documents?.length || 0})` },
+    { key: 'overview', label: t('tabs.overview') },
+    { key: 'credits', label: `${t('tabs.credits')} (${credits?.length || 0})` },
+    { key: 'transactions', label: `${t('tabs.transactions')} (${transactions?.length || 0})` },
+    { key: 'documents', label: `${t('tabs.documents')} (${documents?.length || 0})` },
   ];
 
   return (
     <div>
-      <Link 
-        to="/properties" 
+      <Link
+        to="/properties"
         className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-800 mb-4"
       >
         <ArrowLeft className="w-4 h-4" />
-        Zurück
+        {t('common.back')}
       </Link>
 
       <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
@@ -80,25 +80,25 @@ function PropertyDetail() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
           <div>
-            <p className="text-sm text-slate-500">Einnahmen</p>
+            <p className="text-sm text-slate-500">{t('dashboard.income')}</p>
             <p className="text-xl font-semibold text-green-600">
               € {Number(total_income).toLocaleString('de-AT', { minimumFractionDigits: 2 })}
             </p>
           </div>
           <div>
-            <p className="text-sm text-slate-500">Ausgaben</p>
+            <p className="text-sm text-slate-500">{t('dashboard.expenses')}</p>
             <p className="text-xl font-semibold text-red-600">
               € {Number(total_expenses).toLocaleString('de-AT', { minimumFractionDigits: 2 })}
             </p>
           </div>
           <div>
-            <p className="text-sm text-slate-500">Bilanz</p>
+            <p className="text-sm text-slate-500">{t('dashboard.overview')}</p>
             <p className={`text-xl font-semibold ${Number(balance) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               € {Number(balance).toLocaleString('de-AT', { minimumFractionDigits: 2 })}
             </p>
           </div>
           <div>
-            <p className="text-sm text-slate-500">Kredit offen</p>
+            <p className="text-sm text-slate-500">{t('dashboard.creditBalance')}</p>
             <p className="text-xl font-semibold text-slate-700">
               € {Number(total_credit_balance).toLocaleString('de-AT', { minimumFractionDigits: 2 })}
             </p>
@@ -173,6 +173,7 @@ function OverviewTab({ property }: { property: any }) {
 }
 
 function CreditsTab({ propertyId, credits }: { propertyId: string; credits: any[] }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const handleSuccess = () => {
@@ -195,18 +196,18 @@ function CreditsTab({ propertyId, credits }: { propertyId: string; credits: any[
       {!credits.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
           <CreditCard className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-          <p className="text-slate-500">Keine Kredite vorhanden.</p>
+          <p className="text-slate-500">{t('credit.noCredits')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Name</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Kreditsumme</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Zinssatz</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Monatl. Rate</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Restschuld</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('credit.name')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('credit.originalAmount')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('credit.interestRate')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('credit.monthlyPayment')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('credit.currentBalance')}</th>
                 <th className="px-6 py-3"></th>
               </tr>
             </thead>
@@ -219,7 +220,7 @@ function CreditsTab({ propertyId, credits }: { propertyId: string; credits: any[
                   <td className="px-6 py-4 text-right text-slate-600">€ {Number(credit.monthly_payment).toLocaleString('de-AT', { minimumFractionDigits: 2 })}</td>
                   <td className="px-6 py-4 text-right font-medium text-slate-800">€ {Number(credit.current_balance || credit.original_amount).toLocaleString('de-AT', { minimumFractionDigits: 2 })}</td>
                   <td className="px-6 py-4 text-right">
-                    <button onClick={() => { if (confirm('Kredit löschen?')) deleteMutation.mutate(credit.id); }} className="p-2 text-slate-400 hover:text-red-600">
+                    <button onClick={() => { if (confirm(t('credit.deleteConfirm'))) deleteMutation.mutate(credit.id); }} className="p-2 text-slate-400 hover:text-red-600">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
@@ -234,6 +235,7 @@ function CreditsTab({ propertyId, credits }: { propertyId: string; credits: any[
 }
 
 function TransactionsTab({ propertyId, transactions, credits }: { propertyId: string; transactions: any[]; credits: any[] }) {
+  const { t, getTransactionCategoryLabel } = useTranslation();
   const queryClient = useQueryClient();
 
   const handleSuccess = () => {
@@ -258,17 +260,17 @@ function TransactionsTab({ propertyId, transactions, credits }: { propertyId: st
       {!transactions.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
           <Receipt className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-          <p className="text-slate-500">Keine Buchungen vorhanden.</p>
+          <p className="text-slate-500">{t('transaction.noTransactions')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Datum</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Kategorie</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Beschreibung</th>
-                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">Betrag</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.date')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.category')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.description')}</th>
+                <th className="text-right px-6 py-3 text-sm font-medium text-slate-600">{t('transaction.amount')}</th>
                 <th className="px-6 py-3"></th>
               </tr>
             </thead>
@@ -278,7 +280,7 @@ function TransactionsTab({ propertyId, transactions, credits }: { propertyId: st
                   <td className="px-6 py-4 text-slate-600">{formatDate(tx.date)}</td>
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700">
-                      {TRANSACTION_CATEGORY_LABELS[tx.category as TransactionCategory] || tx.category}
+                      {getTransactionCategoryLabel(tx.category as TransactionCategory)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-600">{tx.description || '-'}</td>
@@ -286,7 +288,7 @@ function TransactionsTab({ propertyId, transactions, credits }: { propertyId: st
                     {tx.type === 'income' ? '+' : '-'}€ {Number(tx.amount).toLocaleString('de-AT', { minimumFractionDigits: 2 })}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button onClick={() => { if (confirm('Buchung löschen?')) deleteMutation.mutate(tx.id); }} className="p-2 text-slate-400 hover:text-red-600">
+                    <button onClick={() => { if (confirm(t('transaction.deleteConfirm'))) deleteMutation.mutate(tx.id); }} className="p-2 text-slate-400 hover:text-red-600">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
@@ -301,6 +303,7 @@ function TransactionsTab({ propertyId, transactions, credits }: { propertyId: st
 }
 
 function DocumentsTab({ propertyId, documents }: { propertyId: string; documents: any[] }) {
+  const { t, getDocumentCategoryLabel } = useTranslation();
   const queryClient = useQueryClient();
 
   const handleSuccess = () => {
@@ -323,17 +326,17 @@ function DocumentsTab({ propertyId, documents }: { propertyId: string; documents
       {!documents.length ? (
         <div className="bg-white rounded-xl border border-slate-200 p-8 text-center">
           <FileText className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-          <p className="text-slate-500">Keine Dokumente vorhanden.</p>
+          <p className="text-slate-500">{t('document.noDocuments')}</p>
         </div>
       ) : (
         <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
           <table className="w-full">
             <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Datei</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Kategorie</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Beschreibung</th>
-                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">Hochgeladen</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.file')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.category')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.description')}</th>
+                <th className="text-left px-6 py-3 text-sm font-medium text-slate-600">{t('document.uploaded')}</th>
                 <th className="px-6 py-3"></th>
               </tr>
             </thead>
@@ -343,7 +346,7 @@ function DocumentsTab({ propertyId, documents }: { propertyId: string; documents
                   <td className="px-6 py-4 font-medium text-slate-800">{doc.filename}</td>
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700">
-                      {DOCUMENT_CATEGORY_LABELS[doc.category as DocumentCategory] || doc.category}
+                      {getDocumentCategoryLabel(doc.category as DocumentCategory)}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-slate-600">{doc.description || '-'}</td>
@@ -352,7 +355,7 @@ function DocumentsTab({ propertyId, documents }: { propertyId: string; documents
                     <a href={getDocumentDownloadUrl(doc.id)} className="p-2 text-slate-400 hover:text-primary-600">
                       <Download className="w-4 h-4" />
                     </a>
-                    <button onClick={() => { if (confirm('Dokument löschen?')) deleteMutation.mutate(doc.id); }} className="p-2 text-slate-400 hover:text-red-600">
+                    <button onClick={() => { if (confirm(t('document.deleteConfirm'))) deleteMutation.mutate(doc.id); }} className="p-2 text-slate-400 hover:text-red-600">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </td>
