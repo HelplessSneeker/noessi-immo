@@ -1,10 +1,10 @@
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Home, Building2, FileText, Receipt } from 'lucide-react';
+import { Home, Building2, FileText, Wallet } from 'lucide-react';
 import Dashboard from './pages/Dashboard';
 import Properties from './pages/Properties';
 import PropertyDetail from './pages/PropertyDetail';
 import Documents from './pages/Documents';
-import Transactions from './pages/Transactions';
+import Finanzen from './pages/Finanzen';
 
 function App() {
   const location = useLocation();
@@ -12,7 +12,7 @@ function App() {
   const navItems = [
     { path: '/', icon: Home, label: 'Dashboard' },
     { path: '/properties', icon: Building2, label: 'Immobilien' },
-    { path: '/transactions', icon: Receipt, label: 'Buchungen' },
+    { path: '/finanzen', icon: Wallet, label: 'Finanzen' },
     { path: '/documents', icon: FileText, label: 'Dokumente' },
   ];
 
@@ -55,7 +55,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/properties" element={<Properties />} />
           <Route path="/properties/:id" element={<PropertyDetail />} />
-          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/finanzen" element={<Finanzen />} />
           <Route path="/documents" element={<Documents />} />
         </Routes>
       </main>
