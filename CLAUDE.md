@@ -13,10 +13,11 @@ immo-manager/
 
 ## Tech Stack
 
-- **Backend:** Python 3.11, FastAPI, SQLAlchemy, PostgreSQL
+- **Backend:** Python 3.11, FastAPI, SQLAlchemy, PostgreSQL, Alembic
 - **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, TanStack Query, react-i18next
 - **Infrastruktur:** Docker Compose
 - **i18n:** Deutsch (Standard), English
+- **Migrations:** Alembic (automatic on container start)
 
 ## Datenmodell
 
@@ -63,6 +64,21 @@ cd backend && uvicorn app.main:app --reload
 
 # Nur Frontend (benötigt .env - siehe frontend/.env.example)
 cd frontend && npm run dev
+```
+
+## Datenbank-Migrationen
+
+Migrations laufen automatisch beim Backend-Start. Details siehe `backend/MIGRATIONS.md`.
+
+```bash
+# Neue Migration erstellen (nach Model-Änderungen)
+cd backend && ./migrate.sh create "beschreibung"
+
+# Migration-Status prüfen
+./migrate.sh status
+
+# Manuelle Anwendung (falls nötig)
+./migrate.sh up
 ```
 
 ## Internationalisierung (i18n)

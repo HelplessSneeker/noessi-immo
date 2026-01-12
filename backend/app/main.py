@@ -3,12 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from .database import engine, Base
+from .database import get_db
 from .routers import properties, credits, transactions, documents
 from .i18n.translator import translator
-
-# Create database tables
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Immo Manager API",

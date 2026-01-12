@@ -18,6 +18,12 @@ backend/
 │       ├── credits.py
 │       ├── transactions.py
 │       └── documents.py
+├── migrations/           # Alembic Migration Files
+│   ├── env.py
+│   └── versions/
+├── alembic.ini          # Alembic Configuration
+├── migrate.sh           # Helper Script für Migrations
+├── docker-entrypoint.sh # Auto-Migration on Container Start
 ├── requirements.txt
 └── Dockerfile
 ```
@@ -59,6 +65,21 @@ backend/
        id: UUID
        model_config = ConfigDict(from_attributes=True)
    ```
+
+3. Migration erstellen:
+   ```bash
+   ./migrate.sh create "add neue_tabelle"
+   # Migration wird automatisch beim Container-Start angewendet
+   ```
+
+### Database Migrations
+
+Alembic verwaltet Schema-Änderungen. Siehe `MIGRATIONS.md` für Details.
+
+**Quick Start:**
+- Nach Model-Änderung: `./migrate.sh create "beschreibung"`
+- Migration prüfen: `./migrate.sh status`
+- Migrations laufen automatisch beim Backend-Start
 
 ### Dependency Injection
 
