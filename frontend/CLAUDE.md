@@ -17,13 +17,23 @@ frontend/
 │   │   └── forms/
 │   │       ├── CreditForm.tsx
 │   │       ├── DocumentForm.tsx
-│   │       └── TransactionForm.tsx
+│   │       ├── TransactionForm.tsx
+│   │       ├── GlobalCreditForm.tsx
+│   │       └── GlobalTransactionForm.tsx
+│   ├── i18n/
+│   │   ├── index.ts      # i18n Konfiguration (react-i18next)
+│   │   └── locales/
+│   │       ├── de.json   # Deutsche Übersetzungen
+│   │       └── en.json   # Englische Übersetzungen
+│   ├── hooks/
+│   │   └── useTranslation.ts  # Translation Hook
 │   ├── types/
-│   │   └── index.ts      # TypeScript Interfaces, Enums, Labels
+│   │   └── index.ts      # TypeScript Interfaces, Enums
 │   └── pages/
 │       ├── Dashboard.tsx
 │       ├── Properties.tsx
 │       ├── PropertyDetail.tsx
+│       ├── Finances.tsx  # Globale Finanzübersicht
 │       ├── Transactions.tsx
 │       └── Documents.tsx
 ├── package.json
@@ -119,15 +129,20 @@ mutation.mutate(data);
 Formulare für Credits, Transactions und Documents sind als separate Komponenten in `src/components/forms/` implementiert:
 
 ```tsx
+// Property-spezifische Forms
 import CreditForm from '../components/forms/CreditForm';
 import TransactionForm from '../components/forms/TransactionForm';
 import DocumentForm from '../components/forms/DocumentForm';
 
-// Verwendung (Props: propertyId, onSuccess, initialData optional)
-<CreditForm
-  propertyId={propertyId}
-  onSuccess={() => handleSuccess()}
-/>
+// Globale Forms (property-übergreifend)
+import GlobalCreditForm from '../components/forms/GlobalCreditForm';
+import GlobalTransactionForm from '../components/forms/GlobalTransactionForm';
+
+// Verwendung property-spezifisch (Props: propertyId, onSuccess, initialData optional)
+<CreditForm propertyId={propertyId} onSuccess={() => handleSuccess()} />
+
+// Verwendung global (Property-Auswahl im Formular)
+<GlobalTransactionForm onSuccess={() => handleSuccess()} />
 
 <DocumentForm
   propertyId={propertyId}
@@ -185,14 +200,26 @@ formatDateForInput('01.15.24') // "2024-01-15"
 Number(amount).toLocaleString('de-AT', { minimumFractionDigits: 2 })
 ```
 
-## Deutsche Labels
+## Internationalisierung (i18n)
 
-Kategorien werden über Lookup-Objekte übersetzt:
+Applikation unterstützt Deutsch (Standard) und English via react-i18next:
 ```tsx
-import { TRANSACTION_CATEGORY_LABELS } from '../types';
-// ...
-{TRANSACTION_CATEGORY_LABELS[tx.category]}
+import { useTranslation } from 'react-i18next';
+
+function MyComponent() {
+  const { t } = useTranslation();
+
+  return (
+    <h1>{t('dashboard.title')}</h1>
+    <button>{t('common.save')}</button>
+  );
+}
 ```
+
+**Übersetzungen hinzufügen:**
+- Schlüssel in `src/i18n/locales/de.json` und `en.json` eintragen
+- Nested Objects für Organisation (z.B. `categories.transaction.rent`)
+- Standardsprache: Deutsch (erkannt via Browser-Einstellungen)
 
 ## Commands
 

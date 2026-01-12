@@ -8,12 +8,13 @@ Eine Web-Applikation zur Verwaltung von Eigentumswohnungen in Österreich.
 - **Kreditverwaltung** — Kredite pro Immobilie tracken mit automatischer Restschuld-Berechnung
 - **Buchungen** — Einnahmen und Ausgaben erfassen, kategorisieren und mit Krediten verknüpfen
 - **Dokumentenverwaltung** — Dokumente hochladen und nach Kategorie organisieren
-- **Dashboard** — Übersicht über alle Immobilien mit Finanzkennzahlen
+- **Dashboard & Finanzen** — Übersicht über alle Immobilien mit Finanzkennzahlen
+- **Mehrsprachig** — Deutsch und English via i18n
 
 ## Tech Stack
 
 - **Backend:** Python 3.11, FastAPI, SQLAlchemy, PostgreSQL
-- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, TanStack Query
+- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, TanStack Query, react-i18next
 - **Infrastruktur:** Docker Compose
 
 ## Schnellstart

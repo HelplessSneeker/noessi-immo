@@ -60,6 +60,11 @@ npm run preview
 **Date Handling:**
 - `react-datepicker` 7.5 — Custom date input component
 
+**Internationalization:**
+- `react-i18next` 15.1 — i18n framework (German/English support)
+- `i18next` 24.2 — i18n core library
+- `i18next-browser-languagedetector` 8.0 — Browser language detection
+
 ## Architecture
 
 ```
@@ -69,7 +74,13 @@ src/
 ├── api/
 │   └── client.ts         # Axios instance, API functions
 ├── components/
-│   └── DateInput.tsx     # Reusable date picker (mm.dd.yy format)
+│   ├── DateInput.tsx     # Reusable date picker (mm.dd.yy format)
+│   └── forms/            # Reusable form components
+├── i18n/
+│   ├── index.ts          # i18n configuration
+│   └── locales/          # Translation files (de.json, en.json)
+├── hooks/
+│   └── useTranslation.ts # Translation hook
 ├── pages/                # Route components
 ├── types/
 │   └── index.ts          # TypeScript interfaces, enums

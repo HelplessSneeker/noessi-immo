@@ -52,6 +52,9 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 **File Handling:**
 - `python-multipart` 0.0.17 — File upload support
 
+**Internationalization:**
+- Custom translator module (`app/i18n/translator.py`) — Multilingual API responses
+
 ## Database
 
 **Connection Pool:**

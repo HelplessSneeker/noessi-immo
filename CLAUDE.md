@@ -14,8 +14,9 @@ immo-manager/
 ## Tech Stack
 
 - **Backend:** Python 3.11, FastAPI, SQLAlchemy, PostgreSQL
-- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, TanStack Query
+- **Frontend:** React 18, TypeScript, Vite, Tailwind CSS, TanStack Query, react-i18next
 - **Infrastruktur:** Docker Compose
+- **i18n:** Deutsch (Standard), English
 
 ## Datenmodell
 
@@ -64,11 +65,20 @@ cd backend && uvicorn app.main:app --reload
 cd frontend && npm run dev
 ```
 
+## Internationalisierung (i18n)
+
+- **Sprachen:** Deutsch (Standard), English
+- **Frontend:** react-i18next mit `useTranslation()` Hook
+- **Backend:** Eigene Translator-Klasse für API-Responses
+- **Locale-Dateien:** `frontend/src/i18n/locales/{de,en}.json`
+- Standardsprache: Deutsch (kann via Browser-Einstellungen erkannt werden)
+
 ## Implementierungshinweise
 
 - **Datumsformate:** Einheitlich `mm.dd.yy` via DateInput-Komponente
 - **Fehlerbehandlung:** API-Client fängt Fehler ab und zeigt Meldungen
 - **Upload:** Dokumente werden mit Fehlervalidierung hochgeladen
+- **Übersetzungen:** Alle UI-Texte via `t()` Funktion aus useTranslation Hook
 
 ## Ports
 

@@ -11,6 +11,8 @@ backend/
 │   ├── database.py       # PostgreSQL Connection, SessionLocal, get_db()
 │   ├── models.py         # SQLAlchemy ORM Models
 │   ├── schemas.py        # Pydantic Request/Response Schemas
+│   ├── i18n/
+│   │   └── translator.py # i18n Translator für API-Responses
 │   └── routers/
 │       ├── properties.py
 │       ├── credits.py
@@ -96,6 +98,18 @@ from fastapi import HTTPException
 
 raise HTTPException(status_code=404, detail="Resource nicht gefunden")
 ```
+
+### Internationalisierung (i18n)
+
+Backend unterstützt mehrsprachige API-Responses via Translator-Klasse (`app/i18n/translator.py`):
+```python
+from app.i18n.translator import Translator
+
+translator = Translator(language="de")  # oder "en"
+translated_text = translator.translate("categories.transaction.rent")
+```
+
+Sprache wird aus `Accept-Language` Header erkannt oder standardmäßig auf Deutsch gesetzt.
 
 ## Environment Variables
 
