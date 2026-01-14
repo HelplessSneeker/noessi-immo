@@ -10,6 +10,7 @@ from fastapi import (
 )
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import SQLAlchemyError
 from typing import List, Optional
 from uuid import UUID, uuid4
 from datetime import date
@@ -17,14 +18,25 @@ import os
 import aiofiles
 
 from ..database import get_db
-from ..models import Document, DocumentCategory
+from ..models import Document, DocumentCategory, Property, Transaction, Credit
 from ..schemas import DocumentResponse
 from ..i18n.translator import translator
+from ..exceptions import (
+    ResourceNotFoundException,
+    BusinessLogicException,
+    FileOperationException,
+    DatabaseException
+)
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
 
 # Use environment variable or default to local path for development
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", os.path.join(os.getcwd(), "documents"))
+
+# File validation constants
+MAX_FILE_SIZE_MB = 50
+ALLOWED_EXTENSIONS = {'.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx',
+                      '.xls', '.xlsx', '.txt'}
 
 
 @router.get("/", response_model=List[DocumentResponse])
@@ -55,9 +67,7 @@ def get_documents(
 def get_document(document_id: UUID, request: Request, db: Session = Depends(get_db)):
     document = db.query(Document).filter(Document.id == document_id).first()
     if not document:
-        raise HTTPException(
-            status_code=404, detail=translator.translate("Document not found", request)
-        )
+        raise ResourceNotFoundException("Document", str(document_id))
     return document
 
 
@@ -67,14 +77,12 @@ def download_document(
 ):
     document = db.query(Document).filter(Document.id == document_id).first()
     if not document:
-        raise HTTPException(
-            status_code=404, detail=translator.translate("Document not found", request)
-        )
+        raise ResourceNotFoundException("Document", str(document_id))
 
     if not os.path.exists(document.filepath):
-        raise HTTPException(
-            status_code=404,
-            detail=translator.translate("File not found on disk", request),
+        raise FileOperationException(
+            translator.translate("File not found on disk", request),
+            filepath=document.filepath
         )
 
     return FileResponse(
@@ -98,55 +106,114 @@ async def upload_document(
 ):
     # Validate file
     if not file.filename:
-        raise HTTPException(
-            status_code=400, detail=translator.translate("No file selected", request)
+        raise BusinessLogicException(
+            translator.translate("No file selected", request)
+        )
+
+    # File extension validation
+    file_ext = os.path.splitext(file.filename)[1].lower()
+    if file_ext not in ALLOWED_EXTENSIONS:
+        raise BusinessLogicException(
+            translator.translate("File type not allowed", request),
+            details={"allowed_types": list(ALLOWED_EXTENSIONS)}
+        )
+
+    # Validate property exists
+    property = db.query(Property).filter(Property.id == property_id).first()
+    if not property:
+        raise ResourceNotFoundException("Property", str(property_id))
+
+    # Validate transaction exists if provided
+    if transaction_id:
+        transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+        if not transaction:
+            raise ResourceNotFoundException("Transaction", str(transaction_id))
+        if transaction.property_id != property_id:
+            raise BusinessLogicException(
+                translator.translate("Transaction must belong to the same property", request)
+            )
+
+    # Validate credit exists if provided
+    if credit_id:
+        credit = db.query(Credit).filter(Credit.id == credit_id).first()
+        if not credit:
+            raise ResourceNotFoundException("Credit", str(credit_id))
+        if credit.property_id != property_id:
+            raise BusinessLogicException(
+                translator.translate("Credit must belong to the same property", request)
+            )
+
+    # Validate mutual exclusivity
+    if transaction_id and credit_id:
+        raise BusinessLogicException(
+            translator.translate(
+                "Document cannot be linked to both transaction and credit", request
+            )
         )
 
     # Convert category string to enum
     try:
         category_enum = DocumentCategory(category)
     except ValueError:
-        raise HTTPException(status_code=400, detail=f"Invalid category: {category}")
+        raise BusinessLogicException(f"Invalid category: {category}")
 
-    # Validate mutual exclusivity
-    if transaction_id is not None and credit_id is not None:
-        raise HTTPException(
-            status_code=400,
-            detail=translator.translate(
-                "Document cannot be linked to both transaction and credit", request
-            ),
+    # Read file content
+    try:
+        content = await file.read()
+    except Exception:
+        raise FileOperationException(
+            translator.translate("Failed to read uploaded file", request)
+        )
+
+    # File size validation
+    file_size_mb = len(content) / (1024 * 1024)
+    if file_size_mb > MAX_FILE_SIZE_MB:
+        raise BusinessLogicException(
+            translator.translate("File size exceeds maximum allowed size", request),
+            details={"max_size_mb": MAX_FILE_SIZE_MB, "file_size_mb": round(file_size_mb, 2)}
         )
 
     # Generate unique filename
-    file_ext = os.path.splitext(file.filename)[1] if file.filename else ""
     unique_filename = f"{uuid4()}{file_ext}"
     filepath = os.path.join(UPLOAD_DIR, str(property_id), unique_filename)
 
-    # Ensure directory exists
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-
-    # Save file
-    async with aiofiles.open(filepath, "wb") as out_file:
-        content = await file.read()
-        await out_file.write(content)
+    # Ensure directory exists and save file
+    try:
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        async with aiofiles.open(filepath, "wb") as out_file:
+            await out_file.write(content)
+    except OSError:
+        raise FileOperationException(
+            translator.translate("Failed to save file to disk", request),
+            filepath=filepath
+        )
 
     # Create database record
-    document = Document(
-        property_id=property_id,
-        transaction_id=transaction_id,
-        credit_id=credit_id,
-        filename=file.filename or unique_filename,
-        filepath=filepath,
-        document_date=document_date,
-        category=category_enum.value,
-        description=description,
-    )
+    try:
+        document = Document(
+            property_id=property_id,
+            transaction_id=transaction_id,
+            credit_id=credit_id,
+            filename=file.filename,
+            filepath=filepath,
+            document_date=document_date,
+            category=category_enum.value,
+            description=description,
+        )
 
-    db.add(document)
-    db.commit()
-    db.refresh(document)
-
-    return document
+        db.add(document)
+        db.commit()
+        db.refresh(document)
+        return document
+    except SQLAlchemyError:
+        # Cleanup uploaded file if database operation fails
+        if os.path.exists(filepath):
+            try:
+                os.remove(filepath)
+            except OSError:
+                pass
+        db.rollback()
+        raise DatabaseException("Failed to create document record", operation="create")
 
 
 @router.put("/{document_id}", response_model=DocumentResponse)
@@ -162,9 +229,27 @@ def update_document(
 ):
     document = db.query(Document).filter(Document.id == document_id).first()
     if not document:
-        raise HTTPException(
-            status_code=404, detail=translator.translate("Document not found", request)
-        )
+        raise ResourceNotFoundException("Document", str(document_id))
+
+    # Validate transaction exists if provided
+    if transaction_id:
+        transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+        if not transaction:
+            raise ResourceNotFoundException("Transaction", str(transaction_id))
+        if transaction.property_id != document.property_id:
+            raise BusinessLogicException(
+                translator.translate("Transaction must belong to the same property", request)
+            )
+
+    # Validate credit exists if provided
+    if credit_id:
+        credit = db.query(Credit).filter(Credit.id == credit_id).first()
+        if not credit:
+            raise ResourceNotFoundException("Credit", str(credit_id))
+        if credit.property_id != document.property_id:
+            raise BusinessLogicException(
+                translator.translate("Credit must belong to the same property", request)
+            )
 
     # Validate mutual exclusivity if both are being set
     updated_transaction_id = (
@@ -173,11 +258,10 @@ def update_document(
     updated_credit_id = credit_id if credit_id is not None else document.credit_id
 
     if updated_transaction_id is not None and updated_credit_id is not None:
-        raise HTTPException(
-            status_code=400,
-            detail=translator.translate(
+        raise BusinessLogicException(
+            translator.translate(
                 "Document cannot be linked to both transaction and credit", request
-            ),
+            )
         )
 
     if category is not None:
@@ -185,7 +269,7 @@ def update_document(
             category_enum = DocumentCategory(category)
             document.category = category_enum.value
         except ValueError:
-            raise HTTPException(status_code=400, detail=f"Invalid category: {category}")
+            raise BusinessLogicException(f"Invalid category: {category}")
     if transaction_id is not None:
         document.transaction_id = transaction_id
     if credit_id is not None:
@@ -195,22 +279,32 @@ def update_document(
     if description is not None:
         document.description = description
 
-    db.commit()
-    db.refresh(document)
-    return document
+    try:
+        db.commit()
+        db.refresh(document)
+        return document
+    except SQLAlchemyError:
+        db.rollback()
+        raise DatabaseException("Failed to update document", operation="update")
 
 
 @router.delete("/{document_id}", status_code=204)
 def delete_document(document_id: UUID, request: Request, db: Session = Depends(get_db)):
     document = db.query(Document).filter(Document.id == document_id).first()
     if not document:
-        raise HTTPException(
-            status_code=404, detail=translator.translate("Document not found", request)
-        )
+        raise ResourceNotFoundException("Document", str(document_id))
 
     # Delete file from disk
     if os.path.exists(document.filepath):
-        os.remove(document.filepath)
+        try:
+            os.remove(document.filepath)
+        except OSError:
+            # Log but don't fail if file deletion fails
+            pass
 
-    db.delete(document)
-    db.commit()
+    try:
+        db.delete(document)
+        db.commit()
+    except SQLAlchemyError:
+        db.rollback()
+        raise DatabaseException("Failed to delete document", operation="delete")

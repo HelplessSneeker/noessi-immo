@@ -92,8 +92,8 @@ cd backend && ./migrate.sh create "beschreibung"
 ## Implementierungshinweise
 
 - **Datumsformate:** Einheitlich `mm.dd.yy` via DateInput-Komponente
-- **Fehlerbehandlung:** API-Client fängt Fehler ab und zeigt Meldungen
-- **Upload:** Dokumente werden mit Fehlervalidierung hochgeladen
+- **Fehlerbehandlung:** Umfassende Backend-Validierung mit i18n-Support, Request-ID-Tracking und strukturiertem Logging
+- **Upload:** Dokumente mit Typ-, Größen- und Fehlervalidierung (max 50MB, erlaubte Typen: pdf, jpg, png, doc, xls, txt)
 - **Übersetzungen:** Alle UI-Texte via `t()` Funktion aus useTranslation Hook
 
 ## Ports

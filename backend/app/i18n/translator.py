@@ -22,6 +22,41 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{} is required": "{} ist erforderlich",
         "{} has an invalid value": "{} hat einen ungültigen Wert",
 
+        # Database errors
+        "Internal server error": "Interner Serverfehler",
+        "Database operation failed": "Datenbankoperation fehlgeschlagen",
+        "Referenced resource does not exist": "Referenzierte Ressource existiert nicht",
+        "Resource with this identifier already exists": "Ressource mit dieser Kennung existiert bereits",
+        "Required field is missing": "Pflichtfeld fehlt",
+        "Database constraint violation": "Datenbank-Constraint verletzt",
+
+        # Property errors
+        "Cannot delete property with existing credits, transactions, or documents": "Immobilie mit vorhandenen Krediten, Transaktionen oder Dokumenten kann nicht gelöscht werden",
+        "Purchase price cannot be negative": "Kaufpreis kann nicht negativ sein",
+
+        # Credit errors
+        "Original amount must be positive": "Ursprungsbetrag muss positiv sein",
+        "Interest rate must be between 0 and 100": "Zinssatz muss zwischen 0 und 100 liegen",
+        "Monthly payment must be positive": "Monatliche Rate muss positiv sein",
+        "Monthly payment cannot exceed original amount": "Monatliche Rate kann Ursprungsbetrag nicht überschreiten",
+        "End date must be after start date": "Enddatum muss nach Startdatum liegen",
+        "Start date cannot be in the future": "Startdatum kann nicht in der Zukunft liegen",
+        "Cannot delete credit with linked transactions": "Kredit mit verknüpften Transaktionen kann nicht gelöscht werden",
+
+        # Transaction errors
+        "Amount must be positive": "Betrag muss positiv sein",
+        "Credit must belong to the same property": "Kredit muss zur selben Immobilie gehören",
+        "Transaction linked to credit should use 'loan_payment' category": "Mit Kredit verknüpfte Transaktion sollte Kategorie 'Kreditrate' verwenden",
+        "Category incompatible with income type": "Kategorie nicht kompatibel mit Einnahmen-Typ",
+        "Transaction date cannot be more than 1 year in the future": "Transaktionsdatum darf nicht mehr als 1 Jahr in der Zukunft liegen",
+
+        # Document errors
+        "File type not allowed": "Dateityp nicht erlaubt",
+        "Failed to read uploaded file": "Hochgeladene Datei konnte nicht gelesen werden",
+        "File size exceeds maximum allowed size": "Dateigröße überschreitet maximale Größe",
+        "Failed to save file to disk": "Datei konnte nicht auf Festplatte gespeichert werden",
+        "Transaction must belong to the same property": "Transaktion muss zur selben Immobilie gehören",
+
         # Category translations for display
         "rent": "Miete",
         "operating_costs": "Betriebskosten",
@@ -57,6 +92,41 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Validation error": "Validation error",
         "{} is required": "{} is required",
         "{} has an invalid value": "{} has an invalid value",
+
+        # Database errors
+        "Internal server error": "Internal server error",
+        "Database operation failed": "Database operation failed",
+        "Referenced resource does not exist": "Referenced resource does not exist",
+        "Resource with this identifier already exists": "Resource with this identifier already exists",
+        "Required field is missing": "Required field is missing",
+        "Database constraint violation": "Database constraint violation",
+
+        # Property errors
+        "Cannot delete property with existing credits, transactions, or documents": "Cannot delete property with existing credits, transactions, or documents",
+        "Purchase price cannot be negative": "Purchase price cannot be negative",
+
+        # Credit errors
+        "Original amount must be positive": "Original amount must be positive",
+        "Interest rate must be between 0 and 100": "Interest rate must be between 0 and 100",
+        "Monthly payment must be positive": "Monthly payment must be positive",
+        "Monthly payment cannot exceed original amount": "Monthly payment cannot exceed original amount",
+        "End date must be after start date": "End date must be after start date",
+        "Start date cannot be in the future": "Start date cannot be in the future",
+        "Cannot delete credit with linked transactions": "Cannot delete credit with linked transactions",
+
+        # Transaction errors
+        "Amount must be positive": "Amount must be positive",
+        "Credit must belong to the same property": "Credit must belong to the same property",
+        "Transaction linked to credit should use 'loan_payment' category": "Transaction linked to credit should use 'loan_payment' category",
+        "Category incompatible with income type": "Category incompatible with income type",
+        "Transaction date cannot be more than 1 year in the future": "Transaction date cannot be more than 1 year in the future",
+
+        # Document errors
+        "File type not allowed": "File type not allowed",
+        "Failed to read uploaded file": "Failed to read uploaded file",
+        "File size exceeds maximum allowed size": "File size exceeds maximum allowed size",
+        "Failed to save file to disk": "Failed to save file to disk",
+        "Transaction must belong to the same property": "Transaction must belong to the same property",
 
         # Categories in English
         "rent": "Rent",

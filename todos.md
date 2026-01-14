@@ -29,3 +29,12 @@ add support for mobile or smaller screens
 ✔ Buchung should be Finanzen instead with tab for Krediete and Buchungen 
 
 tool for projections
+
+Periodisch automatisierte buchungen
+
+Automatische Krediet prognose 
+
+## Open Next Steps
+
+Error Handeling im frontend
+Befor user introduction revisit migrations
