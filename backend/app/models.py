@@ -78,8 +78,14 @@ class Transaction(Base):
     property_id = Column(UUID(as_uuid=True), ForeignKey("properties.id"), nullable=False)
     credit_id = Column(UUID(as_uuid=True), ForeignKey("credits.id"), nullable=True)
     date = Column(Date, nullable=False)
-    type = Column(SQLEnum(TransactionType), nullable=False)
-    category = Column(SQLEnum(TransactionCategory), nullable=False)
+    type = Column(
+        SQLEnum(TransactionType, values_callable=lambda obj: [e.value for e in obj], create_type=False, name='transactiontype'),
+        nullable=False
+    )
+    category = Column(
+        SQLEnum(TransactionCategory, values_callable=lambda obj: [e.value for e in obj], create_type=False, name='transactioncategory'),
+        nullable=False
+    )
     amount = Column(Numeric(10, 2), nullable=False)
     description = Column(String(500), nullable=True)
     recurring = Column(Boolean, default=False)
@@ -103,7 +109,10 @@ class Document(Base):
     filepath = Column(String(500), nullable=False)
     upload_date = Column(DateTime, default=datetime.utcnow)
     document_date = Column(Date, nullable=True)
-    category = Column(SQLEnum(DocumentCategory), nullable=False)
+    category = Column(
+        SQLEnum(DocumentCategory, values_callable=lambda obj: [e.value for e in obj], create_type=False, name='documentcategory'),
+        nullable=False
+    )
     description = Column(String(500), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
