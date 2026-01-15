@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { DateInput } from '../DateInput';
+import { FormErrorAlert } from '../FormErrorAlert';
 import { createTransaction } from '../../api/client';
 import { type TransactionCreate, type TransactionType, type TransactionCategory, type Credit } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -22,6 +24,7 @@ export function TransactionForm({ propertyId, credits, onSuccess }: TransactionF
     onSuccess: () => {
       setShowForm(false);
       setSelectedCreditId('');
+      toast.success(t('transaction.createSuccess'));
       onSuccess?.();
     },
   });
@@ -63,6 +66,9 @@ export function TransactionForm({ propertyId, credits, onSuccess }: TransactionF
       {showForm && (
         <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
           <h3 className="font-medium text-slate-800 mb-4">{t('transaction.newTransaction')}</h3>
+          {createMutation.isError && (
+            <FormErrorAlert error={createMutation.error} title={t('errors.createFailed')} />
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>

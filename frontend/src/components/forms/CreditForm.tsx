@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { DateInput } from '../DateInput';
+import { FormErrorAlert } from '../FormErrorAlert';
 import { createCredit } from '../../api/client';
 import type { CreditCreate } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -19,6 +21,7 @@ export function CreditForm({ propertyId, onSuccess }: CreditFormProps) {
     mutationFn: createCredit,
     onSuccess: () => {
       setShowForm(false);
+      toast.success(t('credit.createSuccess'));
       onSuccess?.();
     },
   });
@@ -53,6 +56,9 @@ export function CreditForm({ propertyId, onSuccess }: CreditFormProps) {
       {showForm && (
         <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
           <h3 className="font-medium text-slate-800 mb-4">{t('credit.newCredit')}</h3>
+          {createMutation.isError && (
+            <FormErrorAlert error={createMutation.error} title={t('errors.createFailed')} />
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>

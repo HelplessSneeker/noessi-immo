@@ -37,7 +37,9 @@
     "noProperties": "No properties available",
     "noPropertiesYet": "No properties available yet.",
     "noPropertiesDescription": "Add your first property to get started.",
-    "deleteConfirm": "Really delete property?"
+    "deleteConfirm": "Really delete property?",
+    "deleteSuccess": "Property deleted",
+    "createSuccess": "Property created"
   },
   "transaction": {
     "transaction": "Transaction",
@@ -58,7 +60,9 @@
     "linkedCredit": "Linked Credit",
     "selectCredit": "Select Credit",
     "optional": "(optional)",
-    "deleteConfirm": "Delete transaction?"
+    "deleteConfirm": "Delete transaction?",
+    "deleteSuccess": "Transaction deleted",
+    "createSuccess": "Transaction created"
   },
   "credit": {
     "credit": "Credit",
@@ -75,7 +79,9 @@
     "currentBalance": "Current Balance",
     "noCredits": "No credits available.",
     "deleteConfirm": "Really delete credit?",
-    "payments": "Payments"
+    "payments": "Payments",
+    "deleteSuccess": "Credit deleted",
+    "createSuccess": "Credit created"
   },
   "document": {
     "document": "Document",
@@ -96,7 +102,8 @@
     "selectProperty": "Select Property",
     "noFile": "No file selected",
     "uploaded": "Uploaded",
-    "deleteConfirm": "Delete document?"
+    "deleteConfirm": "Delete document?",
+    "deleteSuccess": "Document deleted"
   },
   "categories": {
     "transaction": {
@@ -134,5 +141,14 @@
     "credits": "Credits",
     "transactions": "Transactions",
     "documents": "Documents"
+  },
+  "errors": {
+    "networkError": "Network error. Please check your internet connection.",
+    "serverError": "Server error. Please try again later.",
+    "createFailed": "Failed to create:",
+    "updateFailed": "Failed to update:",
+    "deleteFailed": "Failed to delete",
+    "loadFailed": "Failed to load data",
+    "unknownError": "An unknown error occurred"
   }
 }

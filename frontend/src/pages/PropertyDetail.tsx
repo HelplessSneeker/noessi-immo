@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Trash2, Download, CreditCard, Receipt, FileText } from 'lucide-react';
+import toast from 'react-hot-toast';
 import {
   getPropertySummary,
   getCredits,
@@ -17,6 +18,7 @@ import {
   type TransactionCategory
 } from '../types';
 import { formatDate } from '../utils/dateFormat';
+import { getErrorMessage } from '../utils/errorUtils';
 import { CreditForm } from '../components/forms/CreditForm';
 import { TransactionForm } from '../components/forms/TransactionForm';
 import { DocumentForm } from '../components/forms/DocumentForm';
@@ -186,6 +188,10 @@ function CreditsTab({ propertyId, credits }: { propertyId: string; credits: any[
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits', propertyId] });
       queryClient.invalidateQueries({ queryKey: ['property-summary', propertyId] });
+      toast.success(t('credit.deleteSuccess'));
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, t('errors.deleteFailed')));
     },
   });
 
@@ -250,6 +256,10 @@ function TransactionsTab({ propertyId, transactions, credits }: { propertyId: st
       queryClient.invalidateQueries({ queryKey: ['transactions', propertyId] });
       queryClient.invalidateQueries({ queryKey: ['property-summary', propertyId] });
       queryClient.invalidateQueries({ queryKey: ['credits', propertyId] });
+      toast.success(t('transaction.deleteSuccess'));
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, t('errors.deleteFailed')));
     },
   });
 
@@ -316,6 +326,10 @@ function DocumentsTab({ propertyId, documents }: { propertyId: string; documents
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['documents', propertyId] });
       queryClient.invalidateQueries({ queryKey: ['property-summary', propertyId] });
+      toast.success(t('document.deleteSuccess'));
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, t('errors.deleteFailed')));
     },
   });
 

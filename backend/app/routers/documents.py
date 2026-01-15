@@ -25,7 +25,7 @@ from ..exceptions import (
     ResourceNotFoundException,
     BusinessLogicException,
     FileOperationException,
-    DatabaseException
+    DatabaseException,
 )
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
@@ -35,8 +35,18 @@ UPLOAD_DIR = os.getenv("UPLOAD_DIR", os.path.join(os.getcwd(), "documents"))
 
 # File validation constants
 MAX_FILE_SIZE_MB = 50
-ALLOWED_EXTENSIONS = {'.pdf', '.jpg', '.jpeg', '.png', '.doc', '.docx',
-                      '.xls', '.xlsx', '.txt'}
+ALLOWED_EXTENSIONS = {
+    ".pdf",
+    ".jpg",
+    ".jpeg",
+    ".png",
+    ".doc",
+    ".docx",
+    ".xls",
+    ".xlsx",
+    ".txt",
+    ".md",
+}
 
 
 @router.get("/", response_model=List[DocumentResponse])
@@ -82,7 +92,7 @@ def download_document(
     if not os.path.exists(document.filepath):
         raise FileOperationException(
             translator.translate("File not found on disk", request),
-            filepath=document.filepath
+            filepath=document.filepath,
         )
 
     return FileResponse(
@@ -106,16 +116,14 @@ async def upload_document(
 ):
     # Validate file
     if not file.filename:
-        raise BusinessLogicException(
-            translator.translate("No file selected", request)
-        )
+        raise BusinessLogicException(translator.translate("No file selected", request))
 
     # File extension validation
     file_ext = os.path.splitext(file.filename)[1].lower()
     if file_ext not in ALLOWED_EXTENSIONS:
         raise BusinessLogicException(
             translator.translate("File type not allowed", request),
-            details={"allowed_types": list(ALLOWED_EXTENSIONS)}
+            details={"allowed_types": list(ALLOWED_EXTENSIONS)},
         )
 
     # Validate property exists
@@ -125,12 +133,16 @@ async def upload_document(
 
     # Validate transaction exists if provided
     if transaction_id:
-        transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+        transaction = (
+            db.query(Transaction).filter(Transaction.id == transaction_id).first()
+        )
         if not transaction:
             raise ResourceNotFoundException("Transaction", str(transaction_id))
         if transaction.property_id != property_id:
             raise BusinessLogicException(
-                translator.translate("Transaction must belong to the same property", request)
+                translator.translate(
+                    "Transaction must belong to the same property", request
+                )
             )
 
     # Validate credit exists if provided
@@ -170,7 +182,10 @@ async def upload_document(
     if file_size_mb > MAX_FILE_SIZE_MB:
         raise BusinessLogicException(
             translator.translate("File size exceeds maximum allowed size", request),
-            details={"max_size_mb": MAX_FILE_SIZE_MB, "file_size_mb": round(file_size_mb, 2)}
+            details={
+                "max_size_mb": MAX_FILE_SIZE_MB,
+                "file_size_mb": round(file_size_mb, 2),
+            },
         )
 
     # Generate unique filename
@@ -185,7 +200,7 @@ async def upload_document(
     except OSError:
         raise FileOperationException(
             translator.translate("Failed to save file to disk", request),
-            filepath=filepath
+            filepath=filepath,
         )
 
     # Create database record
@@ -233,12 +248,16 @@ def update_document(
 
     # Validate transaction exists if provided
     if transaction_id:
-        transaction = db.query(Transaction).filter(Transaction.id == transaction_id).first()
+        transaction = (
+            db.query(Transaction).filter(Transaction.id == transaction_id).first()
+        )
         if not transaction:
             raise ResourceNotFoundException("Transaction", str(transaction_id))
         if transaction.property_id != document.property_id:
             raise BusinessLogicException(
-                translator.translate("Transaction must belong to the same property", request)
+                translator.translate(
+                    "Transaction must belong to the same property", request
+                )
             )
 
     # Validate credit exists if provided

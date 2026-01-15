@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Plus, Building2, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { getProperties, createProperty, deleteProperty } from '../api/client';
 import type { PropertyCreate } from '../types';
 import { formatDate } from '../utils/dateFormat';
+import { getErrorMessage } from '../utils/errorUtils';
 import { DateInput } from '../components/DateInput';
+import { FormErrorAlert } from '../components/FormErrorAlert';
 import { useTranslation } from '../hooks/useTranslation';
 
 function Properties() {
@@ -23,6 +26,7 @@ function Properties() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['properties'] });
       setShowForm(false);
+      toast.success(t('property.createSuccess'));
     },
   });
 
@@ -30,6 +34,10 @@ function Properties() {
     mutationFn: deleteProperty,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['properties'] });
+      toast.success(t('property.deleteSuccess'));
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, t('errors.deleteFailed')));
     },
   });
 
@@ -64,6 +72,9 @@ function Properties() {
       {showForm && (
         <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
           <h2 className="text-lg font-medium text-slate-800 mb-4">{t('property.createProperty')}</h2>
+          {createMutation.isError && (
+            <FormErrorAlert error={createMutation.error} title={t('errors.createFailed')} />
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>

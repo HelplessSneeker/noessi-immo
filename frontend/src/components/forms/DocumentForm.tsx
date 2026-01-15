@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { DateInput } from '../DateInput';
+import { FormErrorAlert } from '../FormErrorAlert';
 import { uploadDocument, getTransactions, getCredits } from '../../api/client';
 import { type Property, type DocumentCategory } from '../../types';
 import { useTranslation } from '../../hooks/useTranslation';
@@ -15,7 +17,6 @@ interface DocumentFormProps {
 export function DocumentForm({ propertyId, properties, onSuccess }: DocumentFormProps) {
   const { t, getDocumentCategoryLabel } = useTranslation();
   const [showForm, setShowForm] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>(propertyId || '');
   const [selectedCategory, setSelectedCategory] = useState<DocumentCategory>('invoice');
   const [selectedTransactionId, setSelectedTransactionId] = useState<string>('');
@@ -65,12 +66,8 @@ export function DocumentForm({ propertyId, properties, onSuccess }: DocumentForm
       setSelectedCategory('invoice');
       setSelectedTransactionId('');
       setSelectedCreditId('');
-      setUploadSuccess(true);
-      setTimeout(() => setUploadSuccess(false), 3000);
+      toast.success(t('document.uploadSuccess'));
       onSuccess?.();
-    },
-    onError: (error: any) => {
-      console.error('Upload error:', error);
     },
   });
 
@@ -98,12 +95,6 @@ export function DocumentForm({ propertyId, properties, onSuccess }: DocumentForm
 
   return (
     <div>
-      {uploadSuccess && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-sm text-green-800 font-medium">{t('document.uploadSuccess')}</p>
-        </div>
-      )}
-
       <div className="flex justify-end mb-4">
         <button
           onClick={() => setShowForm(!showForm)}
@@ -118,20 +109,7 @@ export function DocumentForm({ propertyId, properties, onSuccess }: DocumentForm
         <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
           <h3 className="font-medium text-slate-800 mb-4">{t('document.upload')}</h3>
           {uploadMutation.isError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-sm text-red-800 font-medium">{t('document.uploadError')}</p>
-              <ul className="mt-1 text-sm text-red-700 list-disc list-inside">
-                {(() => {
-                  const errorMessage = (uploadMutation.error as any)?.response?.data?.detail;
-                  if (Array.isArray(errorMessage)) {
-                    return errorMessage.map((msg: string, idx: number) => <li key={idx}>{msg}</li>);
-                  } else if (typeof errorMessage === 'string') {
-                    return <li>{errorMessage}</li>;
-                  }
-                  return <li>Ein unbekannter Fehler ist aufgetreten</li>;
-                })()}
-              </ul>
-            </div>
+            <FormErrorAlert error={uploadMutation.error} title={t('document.uploadError')} />
           )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">

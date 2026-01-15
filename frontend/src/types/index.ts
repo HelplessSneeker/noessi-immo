@@ -109,3 +109,6 @@ export interface PropertySummary {
   total_credit_balance: number;
   document_count: number;
 }
+
+// Error types
+export * from './errors';

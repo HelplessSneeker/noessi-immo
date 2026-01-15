@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Receipt, CreditCard, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { getTransactions, getProperties, getDocuments, getCredits, deleteCredit } from '../api/client';
 import { type TransactionCategory, type Credit, type Transaction, type Property } from '../types';
 import { formatDate } from '../utils/dateFormat';
+import { getErrorMessage } from '../utils/errorUtils';
 import { GlobalCreditForm } from '../components/forms/GlobalCreditForm';
 import { GlobalTransactionForm } from '../components/forms/GlobalTransactionForm';
 import { useTranslation } from '../hooks/useTranslation';
@@ -180,6 +182,10 @@ function CreditsTab({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['credits'] });
       queryClient.invalidateQueries({ queryKey: ['property-summary'] });
+      toast.success(t('credit.deleteSuccess'));
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, t('errors.deleteFailed')));
     },
   });
 

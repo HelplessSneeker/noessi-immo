@@ -92,7 +92,9 @@ cd backend && ./migrate.sh create "beschreibung"
 ## Implementierungshinweise
 
 - **Datumsformate:** Einheitlich `mm.dd.yy` via DateInput-Komponente
-- **Fehlerbehandlung:** Umfassende Backend-Validierung mit i18n-Support, Request-ID-Tracking und strukturiertem Logging
+- **Fehlerbehandlung:**
+  - Backend: Strukturierte Exceptions, i18n-Support, Request-ID-Tracking, Logging
+  - Frontend: Axios-Interceptors, Toast-Notifications, FormErrorAlert-Komponente
 - **Upload:** Dokumente mit Typ-, Größen- und Fehlervalidierung (max 50MB, erlaubte Typen: pdf, jpg, png, doc, xls, txt)
 - **Übersetzungen:** Alle UI-Texte via `t()` Funktion aus useTranslation Hook
 

@@ -37,7 +37,9 @@
     "noProperties": "Keine Immobilien vorhanden",
     "noPropertiesYet": "Noch keine Immobilien vorhanden.",
     "noPropertiesDescription": "Füge deine erste Immobilie hinzu, um loszulegen.",
-    "deleteConfirm": "Immobilie wirklich löschen?"
+    "deleteConfirm": "Immobilie wirklich löschen?",
+    "deleteSuccess": "Immobilie gelöscht",
+    "createSuccess": "Immobilie erstellt"
   },
   "transaction": {
     "transaction": "Buchung",
@@ -58,7 +60,9 @@
     "linkedCredit": "Verknüpfter Kredit",
     "selectCredit": "Kredit wählen",
     "optional": "(optional)",
-    "deleteConfirm": "Buchung löschen?"
+    "deleteConfirm": "Buchung löschen?",
+    "deleteSuccess": "Buchung gelöscht",
+    "createSuccess": "Buchung erstellt"
   },
   "credit": {
     "credit": "Kredit",
@@ -75,7 +79,9 @@
     "currentBalance": "Restschuld",
     "noCredits": "Keine Kredite vorhanden.",
     "deleteConfirm": "Kredit wirklich löschen?",
-    "payments": "Zahlungen"
+    "payments": "Zahlungen",
+    "deleteSuccess": "Kredit gelöscht",
+    "createSuccess": "Kredit erstellt"
   },
   "document": {
     "document": "Dokument",
@@ -96,7 +102,8 @@
     "selectProperty": "Immobilie wählen",
     "noFile": "Keine Datei ausgewählt",
     "uploaded": "Hochgeladen",
-    "deleteConfirm": "Dokument löschen?"
+    "deleteConfirm": "Dokument löschen?",
+    "deleteSuccess": "Dokument gelöscht"
   },
   "categories": {
     "transaction": {
@@ -134,5 +141,14 @@
     "credits": "Kredite",
     "transactions": "Buchungen",
     "documents": "Dokumente"
+  },
+  "errors": {
+    "networkError": "Netzwerkfehler. Bitte prüfen Sie Ihre Internetverbindung.",
+    "serverError": "Serverfehler. Bitte versuchen Sie es später erneut.",
+    "createFailed": "Fehler beim Erstellen:",
+    "updateFailed": "Fehler beim Aktualisieren:",
+    "deleteFailed": "Fehler beim Löschen",
+    "loadFailed": "Fehler beim Laden der Daten",
+    "unknownError": "Ein unbekannter Fehler ist aufgetreten"
   }
 }

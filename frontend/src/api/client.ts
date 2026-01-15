@@ -1,18 +1,48 @@
-import axios from 'axios';
-import type { 
-  Property, 
-  PropertyCreate, 
-  Credit, 
+import axios, { AxiosError } from 'axios';
+import toast from 'react-hot-toast';
+import i18n from '../i18n';
+import { isNetworkError, getErrorMessage } from '../utils/errorUtils';
+import type {
+  Property,
+  PropertyCreate,
+  Credit,
   CreditCreate,
-  Transaction, 
+  Transaction,
   TransactionCreate,
   Document,
-  PropertySummary 
+  PropertySummary
 } from '../types';
 
 const api = axios.create({
   baseURL: '/api',
 });
+
+// Request interceptor - set Accept-Language header for i18n
+api.interceptors.request.use((config) => {
+  config.headers['Accept-Language'] = i18n.language;
+  return config;
+});
+
+// Response interceptor - handle errors centrally
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    // Network errors - show toast
+    if (isNetworkError(error)) {
+      toast.error(i18n.t('errors.networkError'));
+      return Promise.reject(error);
+    }
+
+    // Server errors (500) - show toast
+    if (error.response?.status === 500) {
+      const message = getErrorMessage(error, i18n.t('errors.serverError'));
+      toast.error(message);
+    }
+
+    // 404, 400, 422 - re-throw for component handling (inline errors)
+    return Promise.reject(error);
+  }
+);
 
 // Properties
 export const getProperties = async (): Promise<Property[]> => {

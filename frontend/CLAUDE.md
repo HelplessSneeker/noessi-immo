@@ -7,13 +7,16 @@ React-Dashboard für die Immo Manager Applikation.
 ```
 frontend/
 ├── src/
-│   ├── main.tsx          # Entry Point, QueryClient, Router
+│   ├── main.tsx          # Entry Point, QueryClient, Router, ErrorBoundary
 │   ├── App.tsx           # Layout, Sidebar, Route-Definitionen
 │   ├── index.css         # Tailwind Imports, globale Styles
 │   ├── api/
-│   │   └── client.ts     # Axios Client, alle API-Funktionen
+│   │   └── client.ts     # Axios Client, Interceptors, API-Funktionen
 │   ├── components/
-│   │   ├── DateInput.tsx # Custom Date Picker (mm.dd.yy Format)
+│   │   ├── DateInput.tsx      # Custom Date Picker (mm.dd.yy Format)
+│   │   ├── ErrorBoundary.tsx  # React Error Boundary
+│   │   ├── FormErrorAlert.tsx # Inline Form Errors
+│   │   ├── ToastProvider.tsx  # Toast Notifications (react-hot-toast)
 │   │   └── forms/
 │   │       ├── CreditForm.tsx
 │   │       ├── DocumentForm.tsx
@@ -28,7 +31,11 @@ frontend/
 │   ├── hooks/
 │   │   └── useTranslation.ts  # Translation Hook
 │   ├── types/
-│   │   └── index.ts      # TypeScript Interfaces, Enums
+│   │   ├── index.ts      # TypeScript Interfaces, Enums
+│   │   └── errors.ts     # Error Response Types
+│   ├── utils/
+│   │   ├── dateFormat.ts # Datumsformatierung
+│   │   └── errorUtils.ts # Error Handling Utilities
 │   └── pages/
 │       ├── Dashboard.tsx
 │       ├── Properties.tsx
@@ -101,17 +108,74 @@ const { data, isLoading } = useQuery({
 
 ### Mutation (Create/Update/Delete)
 ```tsx
+import toast from 'react-hot-toast';
+import { getErrorMessage } from '../utils/errorUtils';
+
 const queryClient = useQueryClient();
 
 const mutation = useMutation({
   mutationFn: createResource,
   onSuccess: () => {
     queryClient.invalidateQueries({ queryKey: ['resource-name'] });
+    toast.success(t('resource.createSuccess'));
+  },
+  onError: (error) => {
+    toast.error(getErrorMessage(error, t('errors.createFailed')));
   },
 });
 
 // Aufruf
 mutation.mutate(data);
+```
+
+## Fehlerbehandlung
+
+### Architektur
+
+- **Axios Interceptors** (`api/client.ts`): Setzt Accept-Language Header, zeigt Toasts für Netzwerk-/Server-Fehler
+- **FormErrorAlert**: Inline-Fehleranzeige in Formularen (für 400/422 Validierungsfehler)
+- **Toast Notifications**: Erfolgs-/Fehlermeldungen für Aktionen (react-hot-toast)
+- **ErrorBoundary**: Fängt React-Render-Fehler ab
+
+### Inline Form Errors
+```tsx
+import { FormErrorAlert } from '../components/FormErrorAlert';
+
+// In der Form-Komponente nach dem Titel:
+{mutation.isError && (
+  <FormErrorAlert error={mutation.error} title={t('errors.createFailed')} />
+)}
+```
+
+### Toast für Delete-Operationen
+```tsx
+import toast from 'react-hot-toast';
+import { getErrorMessage } from '../utils/errorUtils';
+
+const deleteMutation = useMutation({
+  mutationFn: deleteResource,
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['resources'] });
+    toast.success(t('resource.deleteSuccess'));
+  },
+  onError: (error) => {
+    toast.error(getErrorMessage(error, t('errors.deleteFailed')));
+  },
+});
+```
+
+### Error Utilities
+```tsx
+import { getErrorMessage, getValidationErrors, isNetworkError } from '../utils/errorUtils';
+
+// Einzelne Fehlermeldung extrahieren
+getErrorMessage(error, 'Fallback message')
+
+// Alle Validierungsfehler als Array
+getValidationErrors(error)  // ['Field is required', 'Invalid value']
+
+// Prüfen ob Netzwerkfehler (für Retry-Logik)
+isNetworkError(error)
 ```
 
 ## Styling mit Tailwind
@@ -220,6 +284,9 @@ function MyComponent() {
 - Schlüssel in `src/i18n/locales/de.json` und `en.json` eintragen
 - Nested Objects für Organisation (z.B. `categories.transaction.rent`)
 - Standardsprache: Deutsch (erkannt via Browser-Einstellungen)
+
+**Error Keys:** `errors.networkError`, `errors.serverError`, `errors.createFailed`, `errors.deleteFailed`
+**Success Keys:** `{resource}.deleteSuccess` (z.B. `credit.deleteSuccess`)
 
 ## Commands
 
